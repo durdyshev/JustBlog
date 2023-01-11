@@ -1,0 +1,52 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.JustBlog" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:fontFamily">@font/poppins</item>
+    </style>
+    <style name="Theme.JustBlog.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.JustBlog.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.JustBlog.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <attr name="cropme_frame_width_percent" format="fraction" />
+    <attr name="cropme_frame_height_percent" format="fraction" />
+    <attr name="cropme_max_scale" format="float" />
+    <attr name="cropme_with_border" format="boolean" />
+    <attr name="cropme_background_alpha" format="fraction" />
+    <attr name="cropme_custom_shape_layout" format="reference" />
+
+    <attr name="cropme_overlay_shape" format="enum">
+        <enum name="none" value="0" />
+        <enum name="rectangle" value="1" />
+        <enum name="circle" value="2" />
+        <enum name="custom" value="3" />
+    </attr>
+
+    <declare-styleable name="CropLayout">
+        <attr name="cropme_frame_width_percent" />
+        <attr name="cropme_frame_height_percent" />
+        <attr name="cropme_max_scale" />
+        <attr name="cropme_overlay_shape" />
+        <attr name="cropme_with_border" />
+        <attr name="cropme_background_alpha" />
+        <attr name="cropme_custom_shape_layout" />
+    </declare-styleable>
+
+    <declare-styleable name="CropOverlay">
+        <attr name="cropme_with_border" />
+        <attr name="cropme_background_alpha" />
+    </declare-styleable>
+</resources>
