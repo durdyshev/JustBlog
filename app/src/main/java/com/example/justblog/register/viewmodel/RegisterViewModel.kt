@@ -28,7 +28,7 @@ class RegisterViewModel(application: Application): BaseViewModel(application) {
                     if(it.isSuccessful){
                         val userId: String = mAuth.currentUser!!.uid
                         val deviceToken: String = FirebaseMessaging.getInstance().token.toString()
-                        sharedEditor.putString("userId",deviceToken)
+                        sharedEditor.putString("userId",userId)
                         sharedEditor.apply()
 
                         val userMap: MutableMap<String, Any> = HashMap()

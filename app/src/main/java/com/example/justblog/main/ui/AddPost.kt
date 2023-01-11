@@ -1,12 +1,15 @@
 package com.example.justblog.main.ui
 
+
+import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -25,6 +28,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class AddPost : Fragment() {
    private lateinit var addPostViewModel:AddPostViewModel
@@ -91,6 +95,7 @@ class AddPost : Fragment() {
 
        }
         binding.cropView.addOnCropListener(object : OnCropListener {
+            @SuppressLint("SimpleDateFormat")
             override fun onSuccess(bitmap: Bitmap) {
 
                 val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
@@ -139,6 +144,17 @@ class AddPost : Fragment() {
            binding.cropView.setUri( Uri.fromFile(File(it)))
        }
 
+    }
+    private fun showDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(com.example.justblog.R.layout.bottomsheetlayout)
+
+        dialog.show()
+        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window!!.attributes.windowAnimations = com.example.justblog.R.style.DialogAnimation
+        dialog.window!!.setGravity(Gravity.BOTTOM)
     }
 
 }
