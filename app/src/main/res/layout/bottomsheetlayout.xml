@@ -5,16 +5,84 @@
     android:layout_height="match_parent"
     android:background="@drawable/dialog_bg">
 
-    <TextView
-        android:id="@+id/choosetxt"
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:text="Choose"
+        android:text="JustBlog"
         android:textColor="@color/black"
         android:layout_marginTop="5dp"
         android:textSize="25dp"
         android:textStyle="bold"/>
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/bottom_sheet_email"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:background="@drawable/edit_text_background"
+        android:hint="Email"
+        android:maxLength="25"
+        android:paddingLeft="@dimen/_7sdp"
+        android:paddingRight="@dimen/_7sdp"
+        android:layout_marginTop="@dimen/_6sdp"
+        android:layout_marginEnd="@dimen/_24sdp"
+        android:layout_marginStart="@dimen/_24sdp"
+        android:textColor="#B8B8B8"
+        android:textColorHint="#707073"
+        android:inputType="textEmailAddress"
+        android:textSize="@dimen/_10sdp" />
 
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/bottom_sheet_pass"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:background="@drawable/edit_text_background"
+        android:hint="Password"
+        android:maxLength="25"
+        android:paddingLeft="@dimen/_7sdp"
+        android:paddingRight="@dimen/_7sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_24sdp"
+        android:layout_marginStart="@dimen/_24sdp"
+        android:textColor="#B8B8B8"
+        android:textColorHint="#707073"
+        android:inputType="textVisiblePassword"
+        android:textSize="@dimen/_10sdp" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/bottom_sheet_login"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_32sdp"
+        android:layout_marginStart="@dimen/_24sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_24sdp"
+        android:background="@drawable/gradient_login"
+        android:hint="Login"
+        android:inputType="textVisiblePassword"
+        android:maxLength="25"
+        android:paddingLeft="@dimen/_7sdp"
+        android:paddingRight="@dimen/_7sdp"
+        android:textColor="#B8B8B8"
+        android:textColorHint="@color/white"
+        android:textSize="@dimen/_11sdp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Not a member yet?  Register"
+            android:textColor="@color/black"
+            android:layout_marginTop="5dp"
+            android:textSize="12dp"
+            android:layout_weight="1"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
 </LinearLayout>

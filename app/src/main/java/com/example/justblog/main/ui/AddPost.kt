@@ -145,16 +145,6 @@ class AddPost : Fragment() {
        }
 
     }
-    private fun showDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(com.example.justblog.R.layout.bottomsheetlayout)
 
-        dialog.show()
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window!!.attributes.windowAnimations = com.example.justblog.R.style.DialogAnimation
-        dialog.window!!.setGravity(Gravity.BOTTOM)
-    }
 
 }
