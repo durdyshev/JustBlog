@@ -1,10 +1,17 @@
 package com.example.justblog.register.ui
 
+import android.R
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.justblog.SetupInfo
 import com.example.justblog.databinding.ActivityRegisterBinding
@@ -20,7 +27,12 @@ class Register : AppCompatActivity() {
         binding=ActivityRegisterBinding.inflate(layoutInflater)
         view=binding.root
         setContentView(view)
+        hideSystemUI()
         registerViewModel= ViewModelProvider(this)[RegisterViewModel::class.java]
+
+        binding.registerLogin.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         binding.regCreateBtn.setOnClickListener {
             val emailText=binding.regEmail.text.toString().trim()
@@ -45,6 +57,29 @@ class Register : AppCompatActivity() {
                     }
             }
 
+        }
+
+    }
+    private fun hideSystemUI() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(
+            window,
+            window.decorView.findViewById(R.id.content)
+        ).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        hideSystemKeyboard()
+        onWindowFocusChanged(true)
+        return super.dispatchTouchEvent(ev)
+    }
+    private fun hideSystemKeyboard(){
+        if(currentFocus!=null){
+            val inputMethodManager = ContextCompat.getSystemService(this, InputMethodManager::class.java)!!
+            inputMethodManager.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
         }
 
     }

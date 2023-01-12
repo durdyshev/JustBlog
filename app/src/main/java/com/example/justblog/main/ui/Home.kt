@@ -26,6 +26,7 @@ import com.example.justblog.cropimage.CropLayout
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentHomeBinding
 import com.example.justblog.main.model.Bucket
+import com.example.justblog.register.ui.Register
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import java.io.File
@@ -70,6 +71,7 @@ class Home : Fragment() {
         val email=dialog.findViewById<EditText>(R.id.bottom_sheet_email)
         val password=dialog.findViewById<EditText>(R.id.bottom_sheet_pass)
         val login=dialog.findViewById<Button>(R.id.bottom_sheet_login)
+        val register=dialog.findViewById<TextView>(R.id.bottom_sheet_layout_register)
 
         login.setOnClickListener {
             val sharedPreferences:SharedPreferences=requireContext().getSharedPreferences("UserInfo",Context.MODE_PRIVATE)
@@ -93,6 +95,10 @@ class Home : Fragment() {
                     }
                 }
             }
+        }
+        register.setOnClickListener {
+            val intent=Intent(requireContext(),Register::class.java)
+            startActivity(intent)
         }
 
 

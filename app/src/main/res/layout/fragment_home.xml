@@ -14,9 +14,10 @@
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="@dimen/_24sdp"
         android:layout_marginBottom="@dimen/_24sdp"
-        android:backgroundTint="#4267B2"
+        android:backgroundTint="#707073"
         android:src="@drawable/ic_baseline_edit_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:tint="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="#707073"
+        app:tint="@android:color/white" />
 </androidx.constraintlayout.widget.ConstraintLayout>

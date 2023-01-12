@@ -2,9 +2,15 @@ package com.example.justblog.main.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
@@ -28,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         binding=ActivityMainBinding.inflate(layoutInflater)
         view=binding.root
         setContentView(view)
+        hideSystemUI()
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
@@ -52,7 +59,36 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if(hasFocus){
+            hideSystemUI()
+        }
+    }
 
+    private fun hideSystemUI() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(
+            window,
+            window.decorView.findViewById(android.R.id.content)
+        ).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        hideSystemKeyboard()
+        onWindowFocusChanged(true)
+        return super.dispatchTouchEvent(ev)
+    }
+    private fun hideSystemKeyboard(){
+        if(currentFocus!=null){
+            val inputMethodManager = ContextCompat.getSystemService(this, InputMethodManager::class.java)!!
+            inputMethodManager.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+
+    }
   /*  override fun onStart() {
         super.onStart()
         val currentUser= FirebaseAuth.getInstance().currentUser
