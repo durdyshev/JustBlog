@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.*
 import android.widget.*
 import androidx.core.view.ViewCompat
@@ -25,6 +26,8 @@ import com.example.justblog.cropimage.CropLayout
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentHomeBinding
 import com.example.justblog.main.model.Bucket
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -34,12 +37,14 @@ import java.util.*
 class Home : Fragment() {
     private lateinit var binding:FragmentHomeBinding
     private lateinit var picAdapter:RecyclerViewPicAdapter
+    private var mAuth: FirebaseAuth? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding= FragmentHomeBinding.inflate(layoutInflater,container,false)
         val view=binding.root
+        mAuth = FirebaseAuth.getInstance()
         initClickListener()
         // Inflate the layout for this fragment
         return view
@@ -62,7 +67,33 @@ class Home : Fragment() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.bottomsheetlayout)
 
+        val email=dialog.findViewById<EditText>(R.id.bottom_sheet_email)
+        val password=dialog.findViewById<EditText>(R.id.bottom_sheet_pass)
+        val login=dialog.findViewById<Button>(R.id.bottom_sheet_login)
 
+        login.setOnClickListener {
+            val sharedPreferences:SharedPreferences=requireContext().getSharedPreferences("UserInfo",Context.MODE_PRIVATE)
+            val editor=sharedPreferences.edit()
+            val emailText=email.text.trim().toString()
+            val passwordText=password.text.trim().toString()
+
+            if(!TextUtils.isEmpty(emailText) && !TextUtils.isEmpty(passwordText)){
+                mAuth!!.signInWithEmailAndPassword(emailText,passwordText).addOnCompleteListener {task->
+                    if(task.isSuccessful){
+                        val userId=mAuth!!.currentUser!!.uid
+                        val deviceToken: String = FirebaseMessaging.getInstance().token.toString()
+                        editor.putString("userId",userId)
+                        editor.putString("token",deviceToken)
+                        editor.apply()
+                        requireActivity().recreate()
+                    }
+                    else{
+                        Toast.makeText(requireContext(),task.exception.toString(),Toast.LENGTH_LONG)
+                            .show()
+                    }
+                }
+            }
+        }
 
 
         dialog.show()
