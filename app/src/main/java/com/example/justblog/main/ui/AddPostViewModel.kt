@@ -39,7 +39,7 @@ class AddPostViewModel(application: Application) : BaseViewModel(application),Co
      */
     @SuppressLint("Recycle")
     private fun loadImagesFromSDCard(): ArrayList<String> {
-        val uri: Uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val uri: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val cursor: Cursor?
         val columnIndexData: Int
         val column_index_folder_name: Int

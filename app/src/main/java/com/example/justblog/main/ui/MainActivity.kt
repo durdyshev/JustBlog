@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-  /*  override fun onStart() {
+    override fun onStart() {
         super.onStart()
         val currentUser= FirebaseAuth.getInstance().currentUser
         if(currentUser==null){
@@ -98,5 +98,5 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
-    }*/
+    }
   }
