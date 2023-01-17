@@ -1,17 +1,21 @@
 package com.example.justblog
 
+
+import android.R.attr.button
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.amrdeveloper.lottiedialog.LottieDialog
 import com.example.justblog.databinding.ActivityPostSettingsBinding
 import com.example.justblog.main.ui.MainActivity
 import com.google.firebase.firestore.FieldValue
@@ -29,8 +33,6 @@ class PostSettings : AppCompatActivity() {
     private lateinit var view:View
     private lateinit var image:String
     private lateinit var storageReference: StorageReference
-    private lateinit var originalImg:String
-    private lateinit var compressedImg:String
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var userId:String
     private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -66,49 +68,56 @@ class PostSettings : AppCompatActivity() {
             val uploadCompressedImg=storageReference.child("comp_post_images/${pathHash}.jpg")
             val uploadCompressedImage=uploadCompressedImg.putBytes(compressed)
 
-            val postMap: MutableMap<String, Any> = HashMap()
+            binding.postSettingsProgress.visibility=View.VISIBLE
+            binding.postSettingsAddDesc.isEnabled=false
+            binding.postSettingsImageview.isEnabled=false
+            binding.postSettingsCounter.isEnabled=false
+
 
 
             uploadTask.addOnCompleteListener { it1 ->
                 if(it1.isSuccessful){
-                    uploadOriginalImgPath.downloadUrl.addOnSuccessListener { 
-                    originalImg=it.toString()
-                    postMap["image_url"] = originalImg
-                    }
-                }
-            }
-            uploadCompressedImage.addOnCompleteListener { task->
-                if (task.isSuccessful){
-                    uploadCompressedImg.downloadUrl.addOnSuccessListener {
-                        compressedImg=it.toString()
-                        postMap["comp_url"]=compressedImg
-                        postMap["description"] = binding.postSettingsAddDesc.text.toString()
-                        postMap["user_id"] = userId
-                        postMap["wagt"] = FieldValue.serverTimestamp()
-                        postMap["type"] = "post"
+                    uploadOriginalImgPath.downloadUrl.addOnSuccessListener {
+                    val originalImgString=it.toString()
+                         uploadCompressedImage.addOnCompleteListener { task->
+                        if (task.isSuccessful){
+                            uploadCompressedImg.downloadUrl.addOnSuccessListener {
+                                val postMap: MutableMap<String, Any> = HashMap()
+                                postMap["comp_url"]=it.toString()
+                                postMap["description"] = binding.postSettingsAddDesc.text.toString()
+                                postMap["user_id"] = userId
+                                postMap["date"] = FieldValue.serverTimestamp()
+                                postMap["type"] = "post"
+                                postMap["image_url"] = originalImgString
 
-                        firebaseFirestore.collection("users").document(userId).
-                        collection("posts").add(postMap).addOnCompleteListener {
-                            if(it.isSuccessful){
-                                val intent=Intent(this,MainActivity::class.java)
-                                deleteImage(image)
-                                startActivity(intent)
+                                firebaseFirestore.collection("users").document(userId).
+                                collection("posts").add(postMap).addOnCompleteListener {
+                                    if(it.isSuccessful){
+                                     /*   val dialog: LottieDialog = LottieDialog(this)
+                                            .setAnimation(R.raw.done)
+                                            .setAnimationRepeatCount(LottieDialog.INFINITE)
+                                            .setAutoPlayAnimation(true)
+                                             .setMessage("Task is Done :D")
+                                            .setMessageColor(R.color.light_white)
+
+
+                                        dialog.show()*/
+                                       val intent=Intent(this,MainActivity::class.java)
+                                       deleteImage(image)
+                                       startActivity(intent)
+                                    }
+                                    binding.postSettingsProgress.visibility=View.GONE
+                                    binding.postSettingsAddDesc.isEnabled=true
+                                    binding.postSettingsImageview.isEnabled=true
+                                    binding.postSettingsCounter.isEnabled=true
+                                }
                             }
                         }
                     }
                 }
             }
-
-
-
-
-
-
-
-
-
-
         }
+    }
         binding.backButton.setOnClickListener {
             deleteImage(image)
             onBackPressedDispatcher.onBackPressed()

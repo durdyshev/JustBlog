@@ -1,10 +1,12 @@
 package com.example.justblog.main.ui
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -13,10 +15,13 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
 import android.widget.*
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justblog.CryptAndHashAlgorithm
 import com.example.justblog.PostSettings
@@ -25,9 +30,13 @@ import com.example.justblog.RecyclerViewPicAdapter
 import com.example.justblog.cropimage.CropLayout
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentHomeBinding
+import com.example.justblog.main.adapters.PostRecyclerViewAdapter
 import com.example.justblog.main.model.Bucket
+import com.example.justblog.main.model.PostData
 import com.example.justblog.register.ui.Register
+import com.example.justblog.utils.UserCheck
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import java.io.File
 import java.io.FileOutputStream
@@ -38,7 +47,12 @@ import java.util.*
 class Home : Fragment() {
     private lateinit var binding:FragmentHomeBinding
     private lateinit var picAdapter:RecyclerViewPicAdapter
+    private lateinit var postDataArrayList:ArrayList<PostData>
+    private lateinit var firebaseFirestore:FirebaseFirestore
+    private lateinit var postRecyclerViewAdapter: PostRecyclerViewAdapter
+    private lateinit var userCheck: UserCheck
     private var mAuth: FirebaseAuth? = null
+    private val requestPermission = 100
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,9 +60,43 @@ class Home : Fragment() {
         binding= FragmentHomeBinding.inflate(layoutInflater,container,false)
         val view=binding.root
         mAuth = FirebaseAuth.getInstance()
+        initThis()
         initClickListener()
         // Inflate the layout for this fragment
         return view
+    }
+
+    private fun initThis() {
+        userCheck=UserCheck(requireContext())
+        postDataArrayList= ArrayList()
+        firebaseFirestore=FirebaseFirestore.getInstance()
+
+        firebaseFirestore.collection("/users/${userCheck.userId()}/posts/").get()
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    for (documentSnapshot in it.result) {
+                        val postId=documentSnapshot.id
+                        val compUrl=documentSnapshot.getString("comp_url")
+                        val description=documentSnapshot.getString("description")
+                        val imageUrl=documentSnapshot.getString("image_url")
+                        val type=documentSnapshot.getString("type")
+                        val userId=documentSnapshot.getString("user_id")
+                        val date = documentSnapshot.getTimestamp("date")
+                        val postData=PostData(postId,compUrl,description,imageUrl,type,userId,date)
+                        postDataArrayList.add(postData)
+                    }
+        }
+
+        val newList = postDataArrayList.sortedWith(compareBy { it.date }).reversed()
+        val newArrayList = ArrayList<PostData>()
+        newArrayList.addAll(newList)
+        postRecyclerViewAdapter =
+            PostRecyclerViewAdapter(requireContext(), newArrayList)
+        binding.homeRecyclerview.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.homeRecyclerview.adapter = postRecyclerViewAdapter
+
+    }
     }
 
     private fun initClickListener() {
@@ -56,8 +104,9 @@ class Home : Fragment() {
             val sharedPreferences: SharedPreferences =requireContext().getSharedPreferences("UserInfo",
                 Context.MODE_PRIVATE)
             if (sharedPreferences.contains("userId")){
-                showImagesDialog()
-            }else {
+                    showImagesDialog()
+                }
+            else {
                 showAuthDialog()
             }
         }
@@ -235,5 +284,38 @@ class Home : Fragment() {
         return file
     }
 
+    @SuppressLint("ObsoleteSdkInt")
+    private fun requestRuntimePermission():Boolean {
+        val readStorage= ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+        val permissionStorage =
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permissionLocationFine =
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+        val permissionPhoneState =
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_PHONE_STATE)
+        val requestPermissions: MutableList<String> = ArrayList()
+        if (permissionStorage == PackageManager.PERMISSION_DENIED) {
+            requestPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if(readStorage== PackageManager.PERMISSION_DENIED){
+            requestPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+        if (permissionLocationFine == PackageManager.PERMISSION_DENIED) {
+            requestPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+        if (permissionPhoneState == PackageManager.PERMISSION_DENIED) {
+            requestPermissions.add(Manifest.permission.READ_PHONE_STATE)
+        }
+
+        if (requestPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                requestPermissions.toTypedArray(),
+                requestPermission
+            )
+        }
+        return requestPermissions.size==1
+
+    }
 
 }
