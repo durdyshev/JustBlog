@@ -60,6 +60,7 @@ class Home : Fragment() {
         binding= FragmentHomeBinding.inflate(layoutInflater,container,false)
         val view=binding.root
         mAuth = FirebaseAuth.getInstance()
+
         initThis()
         initClickListener()
         // Inflate the layout for this fragment
@@ -67,38 +68,38 @@ class Home : Fragment() {
     }
 
     private fun initThis() {
-        userCheck=UserCheck(requireContext())
-        postDataArrayList= ArrayList()
-        firebaseFirestore=FirebaseFirestore.getInstance()
+        userCheck = UserCheck(requireContext())
+        postDataArrayList = ArrayList()
+        firebaseFirestore = FirebaseFirestore.getInstance()
 
         firebaseFirestore.collection("/users/${userCheck.userId()}/posts/").get()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     for (documentSnapshot in it.result) {
-                        val postId=documentSnapshot.id
-                        val compUrl=documentSnapshot.getString("comp_url")
-                        val description=documentSnapshot.getString("description")
-                        val imageUrl=documentSnapshot.getString("image_url")
-                        val type=documentSnapshot.getString("type")
-                        val userId=documentSnapshot.getString("user_id")
+                        val postId = documentSnapshot.id
+                        val compUrl = documentSnapshot.getString("comp_url")
+                        val description = documentSnapshot.getString("description")
+                        val imageUrl = documentSnapshot.getString("image_url")
+                        val type = documentSnapshot.getString("type")
+                        val userId = documentSnapshot.getString("user_id")
                         val date = documentSnapshot.getTimestamp("date")
-                        val postData=PostData(postId,compUrl,description,imageUrl,type,userId,date)
+                        val postData =
+                            PostData(postId, compUrl, description, imageUrl, type, userId, date!!.toDate())
                         postDataArrayList.add(postData)
                     }
-        }
 
-        val newList = postDataArrayList.sortedWith(compareBy { it.date }).reversed()
-        val newArrayList = ArrayList<PostData>()
-        newArrayList.addAll(newList)
-        postRecyclerViewAdapter =
-            PostRecyclerViewAdapter(requireContext(), newArrayList)
-        binding.homeRecyclerview.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.homeRecyclerview.adapter = postRecyclerViewAdapter
+                    val newList = postDataArrayList.sortedWith(compareBy { it.date }).reversed()
+                    val newArrayList = ArrayList<PostData>()
+                    newArrayList.addAll(newList)
+                    postRecyclerViewAdapter =
+                        PostRecyclerViewAdapter(requireContext(), newArrayList)
+                    binding.homeRecyclerview.layoutManager =
+                        LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                    binding.homeRecyclerview.adapter = postRecyclerViewAdapter
 
+                }
+            }
     }
-    }
-
     private fun initClickListener() {
         binding.fab.setOnClickListener {
             val sharedPreferences: SharedPreferences =requireContext().getSharedPreferences("UserInfo",
