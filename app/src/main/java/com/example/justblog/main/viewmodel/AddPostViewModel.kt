@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.viewmodel
 
 import android.annotation.SuppressLint
 import android.app.Application

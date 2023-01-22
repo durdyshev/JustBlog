@@ -2,11 +2,8 @@ package com.example.justblog.main.ui
 
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -24,6 +21,7 @@ import com.example.justblog.RecyclerViewPicAdapter
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentAddPostBinding
 import com.example.justblog.main.model.Bucket
+import com.example.justblog.main.viewmodel.AddPostViewModel
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -31,7 +29,7 @@ import java.util.*
 
 
 class AddPost : Fragment() {
-   private lateinit var addPostViewModel:AddPostViewModel
+   private lateinit var addPostViewModel: AddPostViewModel
    private lateinit var binding: FragmentAddPostBinding
    private lateinit var picAdapter:RecyclerViewPicAdapter
    private lateinit var listOfImages:ArrayList<String>

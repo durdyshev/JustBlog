@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import androidx.lifecycle.MutableLiveData
 import com.example.justblog.BaseViewModel
+import com.example.justblog.FirebaseDb
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
@@ -22,6 +23,7 @@ class RegisterViewModel(application: Application): BaseViewModel(application) {
     private val firebaseFirestore:FirebaseFirestore=FirebaseFirestore.getInstance()
     private val sharedPreferences:SharedPreferences=application.getSharedPreferences("UserInfo",Context.MODE_PRIVATE)
     private val sharedEditor:Editor=sharedPreferences.edit()
+    private val firebaseDb=FirebaseDb(application)
 
     fun registerUser(email: String, password: String,name:String,username: String) {
 

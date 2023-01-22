@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/_40sdp"
             android:layout_weight="1.5"
-            android:src="@mipmap/circle_person" />
+            android:src="@drawable/ic_round_person_24" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,9 +48,9 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/_2sdp"
             android:layout_weight="1.6"
-            android:src="@drawable/ic_baseline_more_horiz_24"
-            android:layout_marginEnd="@dimen/_2sdp"/>
+            android:src="@drawable/ic_baseline_more_horiz_24" />
     </LinearLayout>
 
     <ImageView
@@ -62,15 +62,56 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_layout_item_imageview">
+
+        <ImageView
+            android:id="@+id/post_layout_item_like"
+            android:padding="@dimen/_2sdp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/up_arrow_icon" />
+
+        <ImageView
+            android:id="@+id/post_layout_item_dislike"
+            android:padding="@dimen/_2sdp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/down_arrow_icon" />
+
+        <ImageView
+            android:id="@+id/post_layout_item_comment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/talk_bubble_icon" />
+
+        <ImageView
+            android:id="@+id/post_layout_item_share"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/share_icon" />
+
+    </LinearLayout>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/post_layout_item_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         android:layout_marginEnd="6dp"
-        android:text="dsdsdssds"
+        android:text="Description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_layout_item_imageview" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
