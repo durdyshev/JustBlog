@@ -106,13 +106,8 @@ class Home : Fragment() {
     }
     private fun initClickListener() {
         binding.fab.setOnClickListener {
-            val sharedPreferences: SharedPreferences =requireContext().getSharedPreferences("UserInfo",
-                Context.MODE_PRIVATE)
-            if (sharedPreferences.contains("userId")){
-                    showImagesDialog()
-                }
-            else {
-                showAuthDialog()
+            if(!requestRuntimePermission()){
+                showImagesDialog()
             }
         }
     }
@@ -292,24 +287,10 @@ class Home : Fragment() {
     @SuppressLint("ObsoleteSdkInt")
     private fun requestRuntimePermission():Boolean {
         val readStorage= ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-        val permissionStorage =
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        val permissionLocationFine =
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-        val permissionPhoneState =
-            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_PHONE_STATE)
+
         val requestPermissions: MutableList<String> = ArrayList()
-        if (permissionStorage == PackageManager.PERMISSION_DENIED) {
-            requestPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        }
-        if(readStorage== PackageManager.PERMISSION_DENIED){
+        if (readStorage == PackageManager.PERMISSION_DENIED) {
             requestPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        if (permissionLocationFine == PackageManager.PERMISSION_DENIED) {
-            requestPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
-        }
-        if (permissionPhoneState == PackageManager.PERMISSION_DENIED) {
-            requestPermissions.add(Manifest.permission.READ_PHONE_STATE)
         }
 
         if (requestPermissions.isNotEmpty()) {

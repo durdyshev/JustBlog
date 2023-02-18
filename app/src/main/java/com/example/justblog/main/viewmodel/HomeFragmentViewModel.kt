@@ -8,9 +8,9 @@ import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
 
 class HomeFragmentViewModel(application: Application) : BaseViewModel(application), CoroutineScope {
+    val app=application
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main
-
 
 }

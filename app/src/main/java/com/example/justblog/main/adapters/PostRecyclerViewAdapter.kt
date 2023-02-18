@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide
 import com.example.justblog.R
 import com.example.justblog.main.model.PostData
 import com.example.justblog.utils.UserCheck
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.*
+import com.google.firebase.firestore.EventListener
 import java.util.*
 
 class PostRecyclerViewAdapter(
@@ -35,6 +35,7 @@ class PostRecyclerViewAdapter(
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = postDataArrayList[position]
         holder.bindView(item)
@@ -42,26 +43,37 @@ class PostRecyclerViewAdapter(
             onClickItem?.invoke(item)
         }
 
-        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Like")
-            .document(userCheck.userId()!!).get().addOnCompleteListener { task ->
-            if (task.result.exists()) {
-                holder.likeImageView.setImageResource(R.drawable.up_arrow_icon_blue)
-            } else {
-                holder.likeImageView.setImageResource(R.drawable.up_arrow_icon)
+        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
+            .addSnapshotListener { value, _ ->
+                if (value!!.size() != 0) {
+                    holder.likeTextView.visibility = View.VISIBLE
+                    holder.likeTextView.text = "Likes:${value.size()}"
+                } else {
+                    holder.likeTextView.visibility = View.GONE
+                }
             }
-        }
 
-        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Dislike")
+        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Comments")
+            .addSnapshotListener { value, _ ->
+                if (value!!.size() != 0) {
+                    holder.commentTextView.visibility = View.VISIBLE
+                    holder.commentTextView.text = "Comments:${value.size()}"
+                } else {
+                    holder.commentTextView.visibility = View.GONE
+                }
+            }
+
+        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
             .document(userCheck.userId()!!).get().addOnCompleteListener { task ->
                 if (task.result.exists()) {
-                    holder.dislikeImageView.setImageResource(R.drawable.down_arrow_icon_blue)
+                    holder.likeImageView.setImageResource(R.drawable.baseline_favorite_24)
                 } else {
-                    holder.dislikeImageView.setImageResource(R.drawable.down_arrow_icon)
+                    holder.likeImageView.setImageResource(R.drawable.baseline_favorite_border_24)
                 }
             }
 
         holder.likeImageView.setOnClickListener {
-            firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Like")
+            firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
                 .document(userCheck.userId()!!).get().addOnCompleteListener {
                     if (!it.result.exists()) {
                         val likeMap: MutableMap<String, Any> = HashMap()
@@ -69,34 +81,14 @@ class PostRecyclerViewAdapter(
                         firebaseFirestore.collection("/users/${item.user_id}/posts")
                             .document(item.postId)
                             .collection("Like").document(userCheck.userId()!!).set(likeMap)
-                        holder.likeImageView.setImageResource(R.drawable.up_arrow_icon_blue)
+                        holder.likeImageView.setImageResource(R.drawable.baseline_favorite_24)
 
                     } else {
                         firebaseFirestore.collection("/users/${item.user_id}/posts")
                             .document(item.postId)
                             .collection("Like").document(userCheck.userId()!!).delete()
-                        holder.likeImageView.setImageResource(R.drawable.up_arrow_icon)
+                        holder.likeImageView.setImageResource(R.drawable.baseline_favorite_border_24)
 
-
-                    }
-                }
-        }
-
-        holder.dislikeImageView.setOnClickListener {
-            firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Dislike")
-                .document(userCheck.userId()!!).get().addOnCompleteListener {
-                    if (!it.result.exists()) {
-                        val likeMap: MutableMap<String, Any> = HashMap()
-                        likeMap["date"] = FieldValue.serverTimestamp()
-                        firebaseFirestore.collection("/users/${item.user_id}/posts")
-                            .document(item.postId)
-                            .collection("Dislike").document(userCheck.userId()!!).set(likeMap)
-                        holder.dislikeImageView.setImageResource(R.drawable.down_arrow_icon_blue)
-                    } else {
-                        firebaseFirestore.collection("/users/${item.user_id}/posts")
-                            .document(item.postId)
-                            .collection("Dislike").document(userCheck.userId()!!).delete()
-                        holder.dislikeImageView.setImageResource(R.drawable.down_arrow_icon)
                     }
                 }
         }
@@ -110,20 +102,22 @@ class PostRecyclerViewAdapter(
         private var dateTextview: TextView = itemView.findViewById(R.id.post_layout_item_date)
         private var nameTextView: TextView = itemView.findViewById(R.id.post_layout_item_name)
         var likeImageView: ImageView = itemView.findViewById(R.id.post_layout_item_like)
-        var dislikeImageView: ImageView = itemView.findViewById(R.id.post_layout_item_dislike)
         var commentImageView: ImageView = itemView.findViewById(R.id.post_layout_item_comment)
         var shareImageView: ImageView = itemView.findViewById(R.id.post_layout_item_share)
+        var likeTextView: TextView = itemView.findViewById(R.id.post_layout_item_likes)
+        var commentTextView: TextView = itemView.findViewById(R.id.post_layout_item_comments)
 
         @SuppressLint("SetTextI18n")
         fun bindView(item: PostData) {
 
             firebaseFirestore.collection("users").document(item.user_id!!).get()
-                .addOnSuccessListener {
-                    if (it.exists()) {
-                        val name = it.getString("name")
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        val name = it.result.getString("name")
                         nameTextView.text = name
                     }
                 }
+
             descTextview.text = item.description
             Glide.with(context).load(item.comp_url).into(imageViewUserShow)
             val dateString =
