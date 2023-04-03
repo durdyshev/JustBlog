@@ -2,7 +2,6 @@ package com.example.justblog
 
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
@@ -15,6 +14,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.justblog.databinding.ActivityPostSettingsBinding
 import com.example.justblog.main.ui.MainActivity
+import com.example.justblog.utils.UserCheck
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -30,8 +30,7 @@ class PostSettings : AppCompatActivity() {
     private lateinit var view: View
     private lateinit var image: String
     private lateinit var storageReference: StorageReference
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var userId: String
+    private lateinit var userCheck: UserCheck
     private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,32 +83,32 @@ class PostSettings : AppCompatActivity() {
                                     postMap["comp_url"] = it.toString()
                                     postMap["description"] =
                                         binding.postSettingsAddDesc.text.toString()
-                                    postMap["user_id"] = userId
+                                    postMap["user_id"] = userCheck.userId()!!
                                     postMap["date"] = FieldValue.serverTimestamp()
                                     postMap["type"] = "post"
                                     postMap["image_url"] = originalImgString
 
-                                    firebaseFirestore.collection("users").document(userId)
+                                    firebaseFirestore.collection("users").document(userCheck.userId()!!)
                                         .collection("posts").add(postMap).addOnCompleteListener {
-                                        if (it.isSuccessful) {
-                                            /*   val dialog: LottieDialog = LottieDialog(this)
-                                                   .setAnimation(R.raw.done)
-                                                   .setAnimationRepeatCount(LottieDialog.INFINITE)
-                                                   .setAutoPlayAnimation(true)
-                                                    .setMessage("Task is Done :D")
-                                                   .setMessageColor(R.color.light_white)
+                                            if (it.isSuccessful) {
+                                                /*   val dialog: LottieDialog = LottieDialog(this)
+                                                       .setAnimation(R.raw.done)
+                                                       .setAnimationRepeatCount(LottieDialog.INFINITE)
+                                                       .setAutoPlayAnimation(true)
+                                                        .setMessage("Task is Done :D")
+                                                       .setMessageColor(R.color.light_white)
 
 
-                                               dialog.show()*/
-                                            val intent = Intent(this, MainActivity::class.java)
-                                            deleteImage(image)
-                                            startActivity(intent)
+                                                   dialog.show()*/
+                                                val intent = Intent(this, MainActivity::class.java)
+                                                deleteImage(image)
+                                                startActivity(intent)
+                                            }
+                                            binding.postSettingsProgress.visibility = View.GONE
+                                            binding.postSettingsAddDesc.isEnabled = true
+                                            binding.postSettingsImageview.isEnabled = true
+                                            binding.postSettingsCounter.isEnabled = true
                                         }
-                                        binding.postSettingsProgress.visibility = View.GONE
-                                        binding.postSettingsAddDesc.isEnabled = true
-                                        binding.postSettingsImageview.isEnabled = true
-                                        binding.postSettingsCounter.isEnabled = true
-                                    }
                                 }
                             }
                         }
@@ -131,11 +130,7 @@ class PostSettings : AppCompatActivity() {
     }
 
     private fun initThis() {
-        sharedPreferences = getSharedPreferences(
-            "UserInfo",
-            Context.MODE_PRIVATE
-        )
-        userId = sharedPreferences.getString("userId", "").toString()
+        userCheck= UserCheck(this)
         storageReference = FirebaseStorage.getInstance().reference;
         image = intent.getStringExtra("image")!!
         binding.postSettingsImageview.setImageBitmap(fileToBitmap(image))
@@ -160,8 +155,7 @@ class PostSettings : AppCompatActivity() {
         val file = File(getExternalFilesDir("/temp/"), "$path.jpg")
         return if (file.exists()) {
             BitmapFactory.decodeFile(file.path)
-        }
-        else {
+        } else {
             null
         }
 

@@ -41,7 +41,7 @@ class RegisterViewModel(application: Application): BaseViewModel(application) {
                 userMap["username"] = username
                 userMap["typing"] = ""
                 userMap["contacts"] = ""
-                userMap["background"] = ""
+                userMap["profile_img"] = ""
                 userMap["motto"] = "Hey there I am using BlogApp"
                 userMap["phone"] = ""
                 firebaseFirestore.collection("users").document(userId).set(
