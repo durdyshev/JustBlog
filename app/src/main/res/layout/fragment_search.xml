@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Search">
+    tools:context="com.example.justblog.main.ui.Search"
+    android:orientation="vertical">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:id="@+id/layout_searchview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Search" />
+        android:layout_height="@dimen/_30sdp"
+        android:layout_margin="@dimen/_5sdp"
+        android:background="@drawable/edit_text_background_white"
+        android:orientation="horizontal">
 
-</FrameLayout>
+        <SearchView
+            android:id="@+id/login_searchView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:queryHint="Search"
+            android:layout_weight="0.4"
+            android:baselineAligned="false"
+            android:closeIcon="@drawable/car_ui_icon_close"
+            android:gravity="end"
+            android:iconifiedByDefault="false"
+            android:searchIcon="@null"
+            android:theme="@style/SearchViewStyle"
+            app:defaultQueryHint="Search"
+            app:searchHintIcon="@null"/>
+    </LinearLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/search_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

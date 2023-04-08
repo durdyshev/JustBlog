@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="profileInfo"
+            type="com.example.justblog.main.model.ProfileData" />
+    </data>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".main.ui.Profile">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/_3sdp"
+                android:layout_marginEnd="@dimen/_3sdp"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/user_profile_profile_imageview"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_70sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    tools:ignore="NestedWeights"
+                    android:src="@drawable/noun_profile_1051511"
+                    android:imageFromUrl="@{profileInfo.profileImg}"
+
+                    />
+
+                <TextView
+                    android:id="@+id/user_profile_profile_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="@{profileInfo.name}"
+                    />
+
+                <TextView
+                    android:id="@+id/user_profile_profile_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:textAlignment="center"
+                    android:text="@{profileInfo.username}"
+                    />
+
+                <TextView
+                    android:id="@+id/user_profile_profile_motto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:textAlignment="center"
+                    android:text="@{profileInfo.motto}"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/user_profile_add_friend_header_linear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="5">
+
+                    <LinearLayout
+                        android:id="@+id/user_profile_add_friend_linear"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_margin="@dimen/_3sdp"
+                        android:layout_weight="1"
+                        android:background="@drawable/ic_arena_recyclerview_linear_layout_textview_background"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/user_profile_add_friend_imageview"
+                            android:layout_width="@dimen/_12sdp"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/add_user" />
+
+                        <TextView
+                            android:id="@+id/user_profile_add_friend_textview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_3sdp"
+                            android:gravity="center"
+                            android:text="Add Friend"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_9sdp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/user_profile_add_friend_more_linear"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_margin="@dimen/_3sdp"
+                        android:layout_weight="4"
+                        android:background="@drawable/ic_main_button_background"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/user_profile_add_friend_more_imageview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="@dimen/_5sdp"
+                            app:srcCompat="@drawable/icons_speech_bubble" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fragment_profile_profile_post_select_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_3sdp" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fragment_profile_profile_post_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/_3sdp"
+                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginEnd="@dimen/_3sdp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</layout>

@@ -20,6 +20,7 @@
     <string name="error_permission_is_off">Permission is off.</string>
     <string name="error_image_is_off_frame">Image is off the frame.</string>
     <string name="error_failed_to_clip_image">Failed to clip image.</string>
+
     <style name="DialogAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
         <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>

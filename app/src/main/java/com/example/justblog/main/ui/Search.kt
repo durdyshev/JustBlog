@@ -1,60 +1,148 @@
 package com.example.justblog.main.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justblog.R
+import com.example.justblog.databinding.FragmentSearchBinding
+import com.example.justblog.main.adapters.SearchRecyclerAdapter
+import com.example.justblog.main.model.ProfileData
+import com.google.firebase.firestore.FirebaseFirestore
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Search.newInstance] factory method to
- * create an instance of this fragment.
- */
 class Search : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var binding: FragmentSearchBinding
+    private lateinit var view: View
+    private var firebaseFirestore = FirebaseFirestore.getInstance()
+    private var searchList = ArrayList<ProfileData>()
+    private lateinit var searchRecyclerAdapter: SearchRecyclerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false)
+    ): View {
+        binding = FragmentSearchBinding.inflate(layoutInflater, container, false)
+        searchView()
+        initRecyclerView()
+        view = binding.root
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Search.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            Search().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun initRecyclerView() {
+        searchRecyclerAdapter =
+            SearchRecyclerAdapter(requireContext(), searchList)
+        binding.searchRecyclerview.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.searchRecyclerview.adapter = searchRecyclerAdapter
+
+        searchRecyclerAdapter.setOnClickItem {
+
+            val bundle = Bundle()
+            bundle.putParcelable("profileData", it)
+            MainActivity.navController.navigate(R.id.userProfile, bundle)
+        }
+    }
+
+    private fun searchView() {
+
+        binding.layoutSearchview.setOnClickListener {
+            binding.loginSearchView.onActionViewExpanded()
+        }
+
+        binding.loginSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String): Boolean {
+
+                if (p0.isEmpty()) {
+                    searchList.clear()
+                    searchRecyclerAdapter.updateList(searchList)
+                } else {
+                    search(p0)
                 }
+                return false
             }
+
+            override fun onQueryTextChange(p0: String): Boolean {
+                if (p0.isEmpty()) {
+                    searchList.clear()
+                    searchRecyclerAdapter.updateList(searchList)
+                } else {
+                    search(p0)
+                }
+                return true
+            }
+        })
+    }
+
+    private fun search(p0: String) {
+        searchList.clear()
+
+        firebaseFirestore.collection("users").orderBy("name").startAt(p0)
+            .endAt(p0 + "\uf8ff").addSnapshotListener { value, error ->
+
+                if (error != null) {
+                    Log.w("qwerty", "listen:error", error)
+                    return@addSnapshotListener
+                }
+
+                for (doc in value!!) {
+                    val name = doc.getString("name")
+                    val username = doc.getString("username")
+                    val profileImg = doc.getString("profile_img")
+                    val userId = doc.getString("userId")
+                    val motto = doc.getString("motto")
+                    val profileData = ProfileData(
+                        name = name,
+                        username = username,
+                        profileImg = profileImg,
+                        userId = userId,
+                        motto = motto
+                    )
+                    if (!searchList.contains(profileData)) {
+                        searchList.add(profileData)
+                    }
+
+                }
+
+                searchRecyclerAdapter.updateList(searchList)
+
+            }
+
+        /* firebaseFirestore.collection("users").orderBy("username").startAt(searchText)
+             .endAt(searchText+"\uf8ff").addSnapshotListener { value, error ->
+                 if(!value!!.isEmpty) {
+                     for (doc in value) {
+                         val name = doc.getString("name")
+                         val username = doc.getString("username")
+                         val profileImg = doc.getString("profile_img")
+                         val userId = doc.getString("userId")
+                         val profileData = ProfileData(
+                             name = name,
+                             username = username,
+                             profileImg = profileImg,
+                             userId = userId
+                         )
+                         if (!searchList.contains(profileData)) {
+                             searchList.add(profileData)
+                         }
+                     }
+                     Log.e("qwertyiki",searchList.size.toString())
+
+
+                 }
+             }*/
+        /*for (hey in searchList){
+            Log.e("qwerty",hey.name!!)
+            Log.e("qwerty",hey.username!!)
+        }*/
     }
 }

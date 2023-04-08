@@ -4,6 +4,9 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
+    id 'androidx.navigation.safeargs'
+    id 'kotlin-parcelize'
+
 }
 
 android {
@@ -45,6 +48,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.car.ui:car-ui-lib:2.0.0'
     implementation 'io.github.amrdeveloper:lottiedialog:1.0.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'

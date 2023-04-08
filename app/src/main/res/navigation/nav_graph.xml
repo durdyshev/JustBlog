@@ -9,13 +9,13 @@
         android:id="@+id/home2"
         android:name="com.example.justblog.main.ui.Home"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
-    </fragment>
+        tools:layout="@layout/fragment_home" />
     <fragment
         android:id="@+id/search"
         android:name="com.example.justblog.main.ui.Search"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
+        tools:layout="@layout/fragment_search">
+
     </fragment>
     <fragment
         android:id="@+id/addPost"
@@ -31,5 +31,17 @@
         android:id="@+id/profile"
         android:name="com.example.justblog.main.ui.Profile"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile">
+
+    </fragment>
+    <fragment
+        android:id="@+id/userProfile"
+        android:name="com.example.justblog.main.ui.UserProfile"
+        android:label="UserProfile">
+        <argument
+            android:name="profileData"
+            app:argType="com.example.justblog.main.model.ProfileData" />
+
+    </fragment>
+
 </navigation>

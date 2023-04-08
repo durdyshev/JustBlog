@@ -32,7 +32,7 @@
                     android:id="@+id/fragment_profile_profile_imageview"
                     android:layout_width="match_parent"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:layout_height="@dimen/_90sdp"
+                    android:layout_height="@dimen/_70sdp"
                     android:imageFromUrl="@{profileInfo.profileImg}"
                     android:src="@drawable/noun_profile_1051511"
                     tools:ignore="NestedWeights" />

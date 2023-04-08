@@ -1,5 +1,6 @@
 package com.example.justblog.main.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
@@ -26,7 +27,6 @@ import com.google.firebase.auth.FirebaseAuth
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var view: View
-    private lateinit var navController: NavController
     private lateinit var navHostFragment:NavHostFragment
     private lateinit var mainActivityViewModel: MainActivityViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +44,11 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel=ViewModelProvider(this)[MainActivityViewModel::class.java]
         mainActivityViewModel.getFirebaseAuth()
         observeLiveData()
+    }
+    companion object{
+        @SuppressLint("StaticFieldLeak")
+        lateinit var navController: NavController
+
     }
     private fun observeLiveData() {
         mainActivityViewModel.currentUserValue.observe(this, Observer {

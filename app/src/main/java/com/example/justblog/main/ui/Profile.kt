@@ -62,10 +62,17 @@ class Profile : Fragment() {
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     val name = it.result.getString("name")
+                    val userId = it.result.getString("userId")
                     val userName = it.result.getString("username")
                     val motto = it.result.getString("motto")
                     val imgUrl = it.result.getString("profile_img")
-                    val profileData = ProfileData(name, userName, motto, imgUrl)
+                    val profileData = ProfileData(
+                        name = name!!,
+                        username = userName!!,
+                        motto = motto!!,
+                        profileImg = imgUrl!!,
+                        userId = userId!!
+                    )
                     binding.profileInfo = profileData
                 }
             }
@@ -108,17 +115,17 @@ class Profile : Fragment() {
                     R.drawable.ic_arena_recyclerview_linear_layout_textview_background
                 )
 
-                when(position){
-                    0->{
+                when (position) {
+                    0 -> {
                         val newList = postDataArrayList.sortedWith(compareBy { it.date }).reversed()
                         val newArrayList = java.util.ArrayList<PostData>()
                         newArrayList.addAll(newList)
                         postRecyclerViewAdapter.updateItems(newArrayList)
                     }
-                    1->{
+                    1 -> {
                         postRecyclerViewAdapter.updateItems(sortList("photo"))
                     }
-                    2->{
+                    2 -> {
                         postRecyclerViewAdapter.updateItems(sortList("video"))
                     }
                 }
@@ -178,8 +185,8 @@ class Profile : Fragment() {
 
     fun sortList(type: String): ArrayList<PostData> {
         tempPostList.clear()
-        for (hey in postDataArrayList){
-            if(hey.type==type){
+        for (hey in postDataArrayList) {
+            if (hey.type == type) {
                 tempPostList.add(hey)
             }
         }
