@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.justblog.main.ui.AddPost
-import com.example.justblog.main.ui.Gallery
 import com.example.justblog.main.ui.TakePhoto
 
 private const val NUM_TABS = 2
@@ -22,6 +21,6 @@ class TabLayoutAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
             0 -> return AddPost()
             1 -> return TakePhoto()
         }
-        return Gallery()
+        return AddPost()
     }
 }
