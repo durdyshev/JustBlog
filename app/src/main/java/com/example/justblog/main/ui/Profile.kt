@@ -81,7 +81,25 @@ class Profile : Fragment() {
     }
 
     private fun initFirebaseProfileData() {
-        firebaseFirestore.collection("users").document(userCheck.userId()!!).get()
+        firebaseFirestore.collection("users").document(userCheck.userId()!!)
+            .addSnapshotListener { value, error ->
+            if (error==null){
+                val name = value?.get("name").toString()
+                val userId = value?.get("userId").toString()
+                val userName = value?.get("username").toString()
+                val motto = value?.get("motto").toString()
+                val imgUrl = value?.get("profile_img").toString()
+                val profileData = ProfileData(
+                    name = name,
+                    username = userName,
+                    motto = motto,
+                    profileImg = imgUrl,
+                    userId = userId
+                )
+                binding.profileInfo = profileData
+            }
+        }
+        /*firebaseFirestore.collection("users").document(userCheck.userId()!!).get()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     val name = it.result.getString("name")
@@ -98,7 +116,7 @@ class Profile : Fragment() {
                     )
                     binding.profileInfo = profileData
                 }
-            }
+            }*/
     }
 
     private fun initSelectRecyclerView() {
