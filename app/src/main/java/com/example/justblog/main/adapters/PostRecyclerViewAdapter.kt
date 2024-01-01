@@ -11,12 +11,16 @@ import com.example.justblog.databinding.PostLayoutItemBinding
 import com.example.justblog.main.model.PostData
 import com.example.justblog.utils.UserCheck
 import com.google.firebase.firestore.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.util.*
 
 class PostRecyclerViewAdapter(
     val context: Context,
     private var postDataArrayList: ArrayList<PostData>,
-) : RecyclerView.Adapter<PostRecyclerViewAdapter.ViewHolder>(){
+) : RecyclerView.Adapter<PostRecyclerViewAdapter.ViewHolder>() {
     private var onClickItem: ((PostData) -> Unit)? = null
     private var firebaseFirestore = FirebaseFirestore.getInstance()
     private var userCheck = UserCheck(context)
@@ -39,63 +43,75 @@ class PostRecyclerViewAdapter(
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val item = postDataArrayList[position]
+            async {
+                firebaseFirestore.collection("users")
+                    .document(item.user_id!!).get()
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            val name = it.result.getString("name").toString()
+                            val profileImg = it.result.getString("profile_img").toString()
+                            holder.view.name = name
+                            holder.view.profileImg = profileImg
 
-        val item = postDataArrayList[position]
+                        }
+                    }
+            }.await()
+            holder.view.compImg = item.comp_url
+            holder.view.postDate = item.date
+            holder.view.desc = item.description
 
-        holder.view.compImg = item.comp_url
-        holder.view.postDate = item.date
-        holder.view.desc = item.description
-        firebaseFirestore.collection("users").document(item.user_id!!).get()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    val name = it.result.getString("name")
-                    val profileImg = it.result.getString("profile_img")
-                    holder.view.name = name
-                    holder.view.profileImg = profileImg
-                }
+
+            holder.itemView.setOnClickListener {
+                onClickItem?.invoke(item)
             }
 
-        holder.itemView.setOnClickListener {
-            onClickItem?.invoke(item)
-        }
 
-
-        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
-            .addSnapshotListener { value, _ ->
-                holder.view.likesCount = value!!.size()
-            }
-
-        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Comments")
-            .addSnapshotListener { value, _ ->
-                holder.view.commentsCount = value!!.size()
-            }
-
-        firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
-            .document(userCheck.userId()!!).get().addOnCompleteListener { task ->
-                holder.view.heartBoolean = task.result.exists()
-            }
-
-        holder.view.postLayoutItemLike.setOnClickListener {
             firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
-                .document(userCheck.userId()!!).get().addOnCompleteListener {
-                    if (!it.result.exists()) {
-                        val likeMap: MutableMap<String, Any> = HashMap()
-                        likeMap["date"] = FieldValue.serverTimestamp()
-                        firebaseFirestore.collection("/users/${item.user_id}/posts")
-                            .document(item.postId)
-                            .collection("Likes").document(userCheck.userId()!!).set(likeMap)
-
-                        holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_24)
-
-                    } else {
-                        firebaseFirestore.collection("/users/${item.user_id}/posts")
-                            .document(item.postId)
-                            .collection("Likes").document(userCheck.userId()!!).delete()
-
-                        holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_border_24)
-
+                .addSnapshotListener { value, _ ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        holder.view.likesCount = value!!.size()
                     }
                 }
+
+            firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Comments")
+                .addSnapshotListener { value, _ ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        holder.view.commentsCount = value!!.size()
+                    }
+                }
+
+            firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
+                .document(userCheck.userId()!!).get().addOnCompleteListener { task ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        holder.view.heartBoolean = task.result.exists()
+                    }
+                }
+
+            holder.view.postLayoutItemLike.setOnClickListener {
+                firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
+                    .document(userCheck.userId()!!).get().addOnCompleteListener {
+                        if (!it.result.exists()) {
+                            val likeMap: MutableMap<String, Any> = HashMap()
+                            likeMap["date"] = FieldValue.serverTimestamp()
+                            firebaseFirestore.collection("/users/${item.user_id}/posts")
+                                .document(item.postId)
+                                .collection("Likes").document(userCheck.userId()!!).set(likeMap)
+                            CoroutineScope(Dispatchers.Main).launch {
+                                holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_24)
+                            }
+                        } else {
+                            firebaseFirestore.collection("/users/${item.user_id}/posts")
+                                .document(item.postId)
+                                .collection("Likes").document(userCheck.userId()!!).delete()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_border_24)
+                            }
+
+                        }
+                    }
+            }
         }
     }
 

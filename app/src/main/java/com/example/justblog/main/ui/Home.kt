@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,11 +35,16 @@ import com.example.justblog.main.adapters.PostRecyclerViewAdapter
 import com.example.justblog.main.model.Bucket
 import com.example.justblog.main.model.PostData
 import com.example.justblog.main.viewmodel.AddPostViewModel
+import com.example.justblog.main.viewmodel.HomeFragmentViewModel
 import com.example.justblog.register.ui.Register
 import com.example.justblog.utils.UserCheck
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -46,67 +52,44 @@ import java.util.*
 
 
 class Home : Fragment() {
-    private lateinit var binding:FragmentHomeBinding
-    private lateinit var picAdapter:RecyclerViewPicAdapter
-    private lateinit var postDataArrayList:ArrayList<PostData>
-    private lateinit var firebaseFirestore:FirebaseFirestore
+    private lateinit var binding: FragmentHomeBinding
+    private lateinit var picAdapter: RecyclerViewPicAdapter
     private lateinit var postRecyclerViewAdapter: PostRecyclerViewAdapter
-    private lateinit var userCheck: UserCheck
     private var mAuth: FirebaseAuth? = null
     private val requestPermission = 100
+    private lateinit var homeFragmentViewModel: HomeFragmentViewModel
+    private var postArrayList = ArrayList<PostData>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding= FragmentHomeBinding.inflate(layoutInflater,container,false)
-        val view=binding.root
+        binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+        val view = binding.root
         mAuth = FirebaseAuth.getInstance()
-
+        initPostRecyclerView()
         initThis()
         initClickListener()
         // Inflate the layout for this fragment
         return view
     }
 
-    private fun initThis() {
-        userCheck = UserCheck(requireContext())
-        postDataArrayList = ArrayList()
-        firebaseFirestore = FirebaseFirestore.getInstance()
-
-        if(mAuth!!.currentUser!=null){
-          firebaseFirestore.collection("/users/${userCheck.userId()}/posts/").get()
-              .addOnCompleteListener {
-                  if (it.isSuccessful) {
-                      for (documentSnapshot in it.result) {
-                          val postId = documentSnapshot.id
-                          val compUrl = documentSnapshot.getString("comp_url")
-                          val description = documentSnapshot.getString("description")
-                          val imageUrl = documentSnapshot.getString("image_url")
-                          val type = documentSnapshot.getString("type")
-                          val userId = documentSnapshot.getString("user_id")
-                          val date = documentSnapshot.getTimestamp("date")
-                          val postData =
-                              PostData(postId, compUrl, description, imageUrl, type, userId, date!!.toDate())
-                          postDataArrayList.add(postData)
-                      }
-
-                      val newList = postDataArrayList.sortedWith(compareBy { it.date }).reversed()
-                      val newArrayList = ArrayList<PostData>()
-                      newArrayList.addAll(newList)
-                      postRecyclerViewAdapter =
-                          PostRecyclerViewAdapter(requireContext(), newArrayList)
-                      binding.homeRecyclerview.layoutManager =
-                          LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-                      binding.homeRecyclerview.adapter = postRecyclerViewAdapter
-
-                  }
-              }
-        }
-
+    private fun initPostRecyclerView() {
+        postRecyclerViewAdapter = PostRecyclerViewAdapter(requireContext(), postArrayList)
+        binding.homeRecyclerview.layoutManager = LinearLayoutManager(requireContext(),
+            LinearLayoutManager.VERTICAL, false)
+        binding.homeRecyclerview.adapter = postRecyclerViewAdapter
     }
+
+    private fun initThis() {
+        homeFragmentViewModel = ViewModelProvider(this)[HomeFragmentViewModel::class.java]
+        homeFragmentViewModel.postDataArrayList.observe(viewLifecycleOwner){
+            postRecyclerViewAdapter.updateItems(it)
+        }
+    }
+
     private fun initClickListener() {
         binding.fab.setOnClickListener {
-            if(!requestRuntimePermission()){
+            if (!requestRuntimePermission()) {
                 showImagesDialog()
             }
         }
@@ -117,42 +100,51 @@ class Home : Fragment() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.bottomsheetlayout)
 
-        val email=dialog.findViewById<EditText>(R.id.bottom_sheet_email)
-        val password=dialog.findViewById<EditText>(R.id.bottom_sheet_pass)
-        val login=dialog.findViewById<Button>(R.id.bottom_sheet_login)
-        val register=dialog.findViewById<TextView>(R.id.bottom_sheet_layout_register)
+        val email = dialog.findViewById<EditText>(R.id.bottom_sheet_email)
+        val password = dialog.findViewById<EditText>(R.id.bottom_sheet_pass)
+        val login = dialog.findViewById<Button>(R.id.bottom_sheet_login)
+        val register = dialog.findViewById<TextView>(R.id.bottom_sheet_layout_register)
 
         login.setOnClickListener {
-            val sharedPreferences:SharedPreferences=requireContext().getSharedPreferences("UserInfo",Context.MODE_PRIVATE)
-            val editor=sharedPreferences.edit()
-            val emailText=email.text.trim().toString()
-            val passwordText=password.text.trim().toString()
+            val sharedPreferences: SharedPreferences =
+                requireContext().getSharedPreferences("UserInfo", Context.MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            val emailText = email.text.trim().toString()
+            val passwordText = password.text.trim().toString()
 
-            if(!TextUtils.isEmpty(emailText) && !TextUtils.isEmpty(passwordText)){
-                mAuth!!.signInWithEmailAndPassword(emailText,passwordText).addOnCompleteListener {task->
-                    if(task.isSuccessful){
-                        val userId=mAuth!!.currentUser!!.uid
-                        val deviceToken: String = FirebaseMessaging.getInstance().token.toString()
-                        editor.putString("userId",userId)
-                        editor.putString("token",deviceToken)
-                        editor.apply()
-                        requireActivity().recreate()
+            if (!TextUtils.isEmpty(emailText) && !TextUtils.isEmpty(passwordText)) {
+                mAuth!!.signInWithEmailAndPassword(emailText, passwordText)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val userId = mAuth!!.currentUser!!.uid
+                            val deviceToken: String =
+                                FirebaseMessaging.getInstance().token.toString()
+                            editor.putString("userId", userId)
+                            editor.putString("token", deviceToken)
+                            editor.apply()
+                            requireActivity().recreate()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                task.exception.toString(),
+                                Toast.LENGTH_LONG
+                            )
+                                .show()
+                        }
                     }
-                    else{
-                        Toast.makeText(requireContext(),task.exception.toString(),Toast.LENGTH_LONG)
-                            .show()
-                    }
-                }
             }
         }
         register.setOnClickListener {
-            val intent=Intent(requireContext(),Register::class.java)
+            val intent = Intent(requireContext(), Register::class.java)
             startActivity(intent)
         }
 
 
         dialog.show()
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window!!.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
         dialog.window!!.setGravity(Gravity.BOTTOM)
@@ -163,32 +155,32 @@ class Home : Fragment() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.bottomsheetlayoutimages)
 
-        val addPostViewModel=ViewModelProvider(this)[AddPostViewModel::class.java]
+        val addPostViewModel = ViewModelProvider(this)[AddPostViewModel::class.java]
         lateinit var picAdapter: RecyclerViewPicAdapter
-        lateinit var listOfImages:ArrayList<String>
-        val cropLayout=dialog.findViewById<CropLayout>(R.id.crop_view)
-        val addPostSpinner=dialog.findViewById<Spinner>(R.id.add_post_spinner)
-        val cropButton=dialog.findViewById<ImageView>(R.id.crop_button)
-        val addPostRecycler=dialog.findViewById<RecyclerView>(R.id.add_post_recycler)
+        lateinit var listOfImages: ArrayList<String>
+        val cropLayout = dialog.findViewById<CropLayout>(R.id.crop_view)
+        val addPostSpinner = dialog.findViewById<Spinner>(R.id.add_post_spinner)
+        val cropButton = dialog.findViewById<ImageView>(R.id.crop_button)
+        val addPostRecycler = dialog.findViewById<RecyclerView>(R.id.add_post_recycler)
         addPostViewModel.getAllDirectories()
 
 
-        addPostViewModel.getImageList().observe(viewLifecycleOwner){
-                listOfImage-> Toast.makeText(requireContext(),listOfImage.size.toString(), Toast.LENGTH_LONG).show()
+        addPostViewModel.getImageList().observe(viewLifecycleOwner) { listOfImage ->
+            Toast.makeText(requireContext(), listOfImage.size.toString(), Toast.LENGTH_LONG).show()
         }
 
         addPostViewModel.imageLists.observe(viewLifecycleOwner) {
-            listOfImages=it
+            listOfImages = it
 
-            picAdapter = RecyclerViewPicAdapter(requireContext(),listOfImages)
+            picAdapter = RecyclerViewPicAdapter(requireContext(), listOfImages)
             addPostRecycler.adapter = picAdapter
             addPostRecycler.layoutManager =
                 GridLayoutManager(requireContext(), 4, GridLayoutManager.VERTICAL, false)
-            ViewCompat.setNestedScrollingEnabled(addPostRecycler,false)
-            cropLayout.setUri( Uri.fromFile(File(it[0])))
+            ViewCompat.setNestedScrollingEnabled(addPostRecycler, false)
+            cropLayout.setUri(Uri.fromFile(File(it[0])))
 
-            picAdapter.setOnClickItem {pic->
-                cropLayout.setUri( Uri.fromFile(File(pic)))
+            picAdapter.setOnClickItem { pic ->
+                cropLayout.setUri(Uri.fromFile(File(pic)))
             }
 
         }
@@ -207,9 +199,10 @@ class Home : Fragment() {
                             addPostSpinner.selectedItem.toString()) {
                             "All" -> {
                                 picAdapter.updateList(listOfImages)
-                                cropLayout.setUri( Uri.fromFile(File(listOfImages[0])))
+                                cropLayout.setUri(Uri.fromFile(File(listOfImages[0])))
 
                             }
+
                             else -> {
                                 for (hey in listOfImages) {
                                     if (hey.contains(selectedItemString)) {
@@ -217,10 +210,11 @@ class Home : Fragment() {
                                     }
                                 }
                                 picAdapter.updateList(selectedImageList)
-                                cropLayout.setUri( Uri.fromFile(File(selectedImageList[0])))
+                                cropLayout.setUri(Uri.fromFile(File(selectedImageList[0])))
                             }
                         }
                     }
+
                     override fun onNothingSelected(p0: AdapterView<*>?) {
                     }
                 }
@@ -235,7 +229,7 @@ class Home : Fragment() {
                 val pathHash = CryptAndHashAlgorithm.Hash.md5(currentHourString)
 
 
-                imageViewBitmapToFile(bitmap,pathHash)
+                imageViewBitmapToFile(bitmap, pathHash)
                 val intent = Intent(requireContext(), PostSettings::class.java)
                 intent.putExtra("image", pathHash)
                 startActivity(intent)
@@ -244,13 +238,21 @@ class Home : Fragment() {
             }
 
             override fun onFailure(e: Exception) {
-                Toast.makeText(requireContext(), R.string.error_failed_to_clip_image, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    R.string.error_failed_to_clip_image,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
 
         cropButton.setOnClickListener(View.OnClickListener {
             if (cropLayout.isOffFrame()) {
-                Toast.makeText(requireContext(), R.string.error_image_is_off_frame, Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    R.string.error_image_is_off_frame,
+                    Toast.LENGTH_LONG
+                ).show()
                 return@OnClickListener
             }
             cropLayout.crop()
@@ -258,23 +260,32 @@ class Home : Fragment() {
 
 
         dialog.show()
-        dialog.window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        dialog.window!!.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
         dialog.window!!.setGravity(Gravity.BOTTOM)
     }
-    private fun initRecyclerView(cropLayout:CropLayout,addPostRecycler: RecyclerView,list:ArrayList<String>){
-        picAdapter = RecyclerViewPicAdapter(requireContext(),list)
+
+    private fun initRecyclerView(
+        cropLayout: CropLayout,
+        addPostRecycler: RecyclerView,
+        list: ArrayList<String>
+    ) {
+        picAdapter = RecyclerViewPicAdapter(requireContext(), list)
         addPostRecycler.adapter = picAdapter
         addPostRecycler.layoutManager =
             GridLayoutManager(requireContext(), 4, GridLayoutManager.VERTICAL, false)
-        ViewCompat.setNestedScrollingEnabled(addPostRecycler,false)
+        ViewCompat.setNestedScrollingEnabled(addPostRecycler, false)
         picAdapter.setOnClickItem {
-            cropLayout.setUri( Uri.fromFile(File(it)))
+            cropLayout.setUri(Uri.fromFile(File(it)))
         }
 
     }
-    private fun imageViewBitmapToFile(bitmap: Bitmap,time: String): File {
+
+    private fun imageViewBitmapToFile(bitmap: Bitmap, time: String): File {
         val file =
             File(requireContext().getExternalFilesDir("/temp/"), "$time.jpg")
         val fOut = FileOutputStream(file, false)
@@ -285,8 +296,11 @@ class Home : Fragment() {
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    private fun requestRuntimePermission():Boolean {
-        val readStorage= ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun requestRuntimePermission(): Boolean {
+        val readStorage = ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
 
         val requestPermissions: MutableList<String> = ArrayList()
         if (readStorage == PackageManager.PERMISSION_DENIED) {
@@ -300,7 +314,7 @@ class Home : Fragment() {
                 requestPermission
             )
         }
-        return requestPermissions.size==1
+        return requestPermissions.size == 1
 
     }
 

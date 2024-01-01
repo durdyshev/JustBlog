@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
+import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.MutableLiveData
 import com.example.justblog.BaseViewModel
 import com.example.justblog.FirebaseDb
@@ -30,7 +31,7 @@ class RegisterViewModel(application: Application): BaseViewModel(application) {
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if(it.isSuccessful){
                 val userId: String = mAuth.currentUser!!.uid
-                val deviceToken: String = FirebaseMessaging.getInstance().token.toString()
+                val deviceToken = FirebaseMessaging.getInstance().token
                 sharedEditor.putString("userId",userId)
                 sharedEditor.apply()
 
@@ -39,6 +40,7 @@ class RegisterViewModel(application: Application): BaseViewModel(application) {
                 userMap["userId"] = userId
                 userMap["name"] = name
                 userMap["username"] = username
+                userMap["lower_username"] = username.lowercase()
                 userMap["typing"] = ""
                 userMap["contacts"] = ""
                 userMap["profile_img"] = ""

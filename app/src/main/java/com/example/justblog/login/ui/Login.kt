@@ -55,7 +55,7 @@ class Login : AppCompatActivity() {
         }
 
         binding.logRegPage.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, Register::class.java)
             startActivity(intent)
         }
     }

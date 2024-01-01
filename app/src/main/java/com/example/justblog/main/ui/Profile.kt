@@ -1,15 +1,23 @@
 package com.example.justblog.main.ui
 
+import android.annotation.SuppressLint
+import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.example.justblog.ImageStatus
 import com.example.justblog.R
 import com.example.justblog.databinding.FragmentProfileBinding
 import com.example.justblog.main.adapters.PostRecyclerViewAdapter
@@ -18,8 +26,11 @@ import com.example.justblog.main.model.PostData
 import com.example.justblog.main.model.ProfileData
 import com.example.justblog.main.model.ProfileSelectData
 import com.example.justblog.utils.UserCheck
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.justblog.TabLayoutAdapter
+import com.google.android.material.tabs.TabLayout
 
 
 class Profile : Fragment() {
@@ -33,6 +44,11 @@ class Profile : Fragment() {
     private lateinit var postDataArrayList: ArrayList<PostData>
     private lateinit var postRecyclerViewAdapter: PostRecyclerViewAdapter
     private var tempPostList = arrayListOf<PostData>()
+    private lateinit var adapter: FragmentStateAdapter
+    private val foldersArray = arrayOf(
+        "Gallery",
+        "Photo",
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +65,14 @@ class Profile : Fragment() {
         initSelectRecyclerView()
         initFirebaseProfileData()
         initRecyclerView()
+        initClickListeners()
         return view
+    }
+
+    private fun initClickListeners() {
+        binding.fragmentProfileProfileImageview.setOnClickListener {
+            showSelectImageDialog()
+        }
     }
 
     private fun initThis() {
@@ -192,5 +215,51 @@ class Profile : Fragment() {
         }
         return tempPostList
 
+    }
+    private fun showSelectImageDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.bottom_sheet_profile_gallery_and_camera)
+        initTabLayout(dialog)
+        dialog.show()
+        dialog.window!!.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
+        dialog.window!!.setGravity(Gravity.BOTTOM)
+        AddPost.state=ImageStatus.PROFILE
+    }
+
+    @SuppressLint("ResourceAsColor")
+    private fun initTabLayout(dialog: Dialog) {
+        val pager=dialog.findViewById<ViewPager2>(R.id.bottom_sheet_viewpager)
+        val tabLayout=dialog.findViewById<TabLayout>(R.id.tabLayout)
+        adapter = TabLayoutAdapter(requireActivity().supportFragmentManager, lifecycle,)
+        pager.adapter = adapter
+        tabLayout.setBackgroundColor(android.R.color.transparent)
+
+        TabLayoutMediator(tabLayout, pager) { tab, position ->
+            tab.text = foldersArray[position]
+        }.attach()
+        pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+            }
+
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+            }
+        })
     }
 }

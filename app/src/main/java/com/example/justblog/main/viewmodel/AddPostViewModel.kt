@@ -4,29 +4,47 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ContentResolver
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.example.justblog.BaseViewModel
+import com.example.justblog.CryptAndHashAlgorithm
 import com.example.justblog.main.model.Bucket
+import com.example.justblog.main.ui.AddPost
+import com.example.justblog.main.ui.MainActivity
+import com.example.justblog.utils.UserCheck
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.HashMap
 import kotlin.coroutines.CoroutineContext
 
 
 /**
  * Use Coroutines To Load Images
  */
-class AddPostViewModel(application: Application) : BaseViewModel(application),CoroutineScope {
+class AddPostViewModel(application: Application) : BaseViewModel(application), CoroutineScope {
 
-    private val application1=application
+    private val application1 = application
     private var imagesLiveData: MutableLiveData<List<String>> = MutableLiveData()
     private var directoriesLiveData: MutableLiveData<ArrayList<Bucket>> = MutableLiveData()
     var imageLists: MutableLiveData<ArrayList<String>> = MutableLiveData()
+    private var storageReference = FirebaseStorage.getInstance().reference
+    private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val userCheck = UserCheck(application.applicationContext)
+
     fun getImageList(): MutableLiveData<List<String>> {
         return imagesLiveData
     }
-    fun getDirectoriesList():MutableLiveData<ArrayList<Bucket>>{
+
+    fun getDirectoriesList(): MutableLiveData<ArrayList<Bucket>> {
         return directoriesLiveData
     }
 
@@ -46,7 +64,8 @@ class AddPostViewModel(application: Application) : BaseViewModel(application),Co
         val listOfAllImages = ArrayList<String>()
         var absolutePathOfImage: String? = null
 
-        val projection = arrayOf(MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+        val projection =
+            arrayOf(MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
 
         cursor = application1.contentResolver!!.query(uri, projection, null, null, null)
 
@@ -67,9 +86,10 @@ class AddPostViewModel(application: Application) : BaseViewModel(application),Co
             }!!
         }
     }
+
     fun getAllDirectories() {
         launch(Dispatchers.Main) {
-           directoriesLiveData.value = withContext(Dispatchers.IO) {
+            directoriesLiveData.value = withContext(Dispatchers.IO) {
                 getImageDirectories()
             }!!
         }
@@ -83,7 +103,7 @@ class AddPostViewModel(application: Application) : BaseViewModel(application),Co
     private fun getImageDirectories(): ArrayList<Bucket> {
         val directories: ArrayList<String> = ArrayList()
         val directories1: ArrayList<Bucket> = ArrayList()
-        val imagesList:ArrayList<String> = ArrayList()
+        val imagesList: ArrayList<String> = ArrayList()
         val contentResolver: ContentResolver = application1.contentResolver
         val queryUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -99,13 +119,13 @@ class AddPostViewModel(application: Application) : BaseViewModel(application),Co
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 val photoUri = cursor.getString(0)
-                val photoFolderPath=File(photoUri).parent!!
+                val photoFolderPath = File(photoUri).parent!!
                 imagesList.add(File(photoUri).absolutePath)
                 if (!directories.contains(photoFolderPath)) {
-             val folderName: MutableList<String> =
-                 File(photoUri).parent!!.split("/").toMutableList()
+                    val folderName: MutableList<String> =
+                        File(photoUri).parent!!.split("/").toMutableList()
 
-                    val bucket=Bucket(folderName.last(),photoFolderPath)
+                    val bucket = Bucket(folderName.last(), photoFolderPath)
                     directories.add(File(photoUri).parent!!)
                     directories1.add(bucket)
                 }
@@ -113,6 +133,50 @@ class AddPostViewModel(application: Application) : BaseViewModel(application),Co
             imageLists.postValue(imagesList)
         }
         return directories1
+    }
+
+    fun saveImg() {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+        val currentHourString = sdf.format(Date())
+        val pathHash = CryptAndHashAlgorithm.Hash.md5(currentHourString)
+
+        val bitmap = AddPost.image
+        val baos = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val originalImage = baos.toByteArray()
+
+        val baosCompress = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, baosCompress)
+        val compressed = baosCompress.toByteArray()
+
+        val uploadOriginalImgPath = storageReference.child("profile_images/${pathHash}.jpg")
+        val uploadTask = uploadOriginalImgPath.putBytes(originalImage)
+        val uploadCompressedImg = storageReference.child("comp_profile_images/${pathHash}.jpg")
+        val uploadCompressedImage = uploadCompressedImg.putBytes(compressed)
+
+        uploadTask.addOnCompleteListener { it1 ->
+            if (it1.isSuccessful) {
+                uploadOriginalImgPath.downloadUrl.addOnSuccessListener {
+                    val originalImgString = it.toString()
+
+                    uploadCompressedImage.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            uploadCompressedImg.downloadUrl.addOnSuccessListener {
+                                val profile: MutableMap<String, Any> = HashMap()
+                                profile["profile_img"] = originalImgString
+
+                                firebaseFirestore.collection("users").document(userCheck.userId()!!)
+                                    .update(profile).addOnCompleteListener {
+                                        if (it.isSuccessful) {
+
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

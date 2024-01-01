@@ -36,10 +36,6 @@ class RecyclerViewPicAdapter(
            setOnClickItem?.invoke(accountDataArrayList[position])
        }
        Glide.with(context).load(accountDataArrayList[position]).into(holder.imageViewUserImage)
-
-
-
-
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
