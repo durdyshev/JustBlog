@@ -134,49 +134,4 @@ class AddPostViewModel(application: Application) : BaseViewModel(application), C
         }
         return directories1
     }
-
-    fun saveImg() {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-        val currentHourString = sdf.format(Date())
-        val pathHash = CryptAndHashAlgorithm.Hash.md5(currentHourString)
-
-        val bitmap = AddPost.image
-        val baos = ByteArrayOutputStream()
-        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val originalImage = baos.toByteArray()
-
-        val baosCompress = ByteArrayOutputStream()
-        bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, baosCompress)
-        val compressed = baosCompress.toByteArray()
-
-        val uploadOriginalImgPath = storageReference.child("profile_images/${pathHash}.jpg")
-        val uploadTask = uploadOriginalImgPath.putBytes(originalImage)
-        val uploadCompressedImg = storageReference.child("comp_profile_images/${pathHash}.jpg")
-        val uploadCompressedImage = uploadCompressedImg.putBytes(compressed)
-
-        uploadTask.addOnCompleteListener { it1 ->
-            if (it1.isSuccessful) {
-                uploadOriginalImgPath.downloadUrl.addOnSuccessListener {
-                    val originalImgString = it.toString()
-
-                    uploadCompressedImage.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            uploadCompressedImg.downloadUrl.addOnSuccessListener {
-                                val profile: MutableMap<String, Any> = HashMap()
-                                profile["profile_img"] = originalImgString
-
-                                firebaseFirestore.collection("users").document(userCheck.userId()!!)
-                                    .update(profile).addOnCompleteListener {
-                                        if (it.isSuccessful) {
-
-                                        }
-                                    }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
 }

@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.justblog.ImageStatus
 import com.example.justblog.R
 import com.example.justblog.databinding.FragmentProfileBinding
 import com.example.justblog.main.adapters.PostRecyclerViewAdapter
@@ -247,14 +246,13 @@ class Profile : Fragment() {
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.window!!.attributes.windowAnimations = R.style.DialogAnimation
         dialog.window!!.setGravity(Gravity.BOTTOM)
-        AddPost.state=ImageStatus.PROFILE
     }
 
     @SuppressLint("ResourceAsColor")
     private fun initTabLayout(dialog: Dialog) {
         val pager=dialog.findViewById<ViewPager2>(R.id.bottom_sheet_viewpager)
         val tabLayout=dialog.findViewById<TabLayout>(R.id.tabLayout)
-        adapter = TabLayoutAdapter(requireActivity().supportFragmentManager, lifecycle,)
+        adapter = TabLayoutAdapter(requireActivity().supportFragmentManager, lifecycle)
         pager.adapter = adapter
         tabLayout.setBackgroundColor(android.R.color.transparent)
 

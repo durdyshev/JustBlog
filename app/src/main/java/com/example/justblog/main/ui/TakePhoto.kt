@@ -1,7 +1,12 @@
 package com.example.justblog.main.ui
 
 import android.content.ContentValues
-import android.content.Context
+import android.content.Intent
+import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -9,7 +14,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -18,7 +22,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.justblog.ProfileImageUpload
 import com.example.justblog.databinding.FragmentTakePhotoBinding
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutionException
@@ -28,10 +34,6 @@ class TakePhoto : Fragment() {
     private lateinit var processCameraProvider: ProcessCameraProvider
     private var imageCapture: ImageCapture? = null
     private lateinit var binding: FragmentTakePhotoBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     companion object {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
@@ -43,7 +45,7 @@ class TakePhoto : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTakePhotoBinding.inflate(layoutInflater, container, false)
-        startCamera1()
+        startCamera()
         binding.takePhoto.setOnClickListener {
             takePhoto()
         }
@@ -54,7 +56,6 @@ class TakePhoto : Fragment() {
     }
 
     private fun takePhoto() {
-        Toast.makeText(requireContext(), "ssss", Toast.LENGTH_LONG).show()
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
@@ -88,14 +89,21 @@ class TakePhoto : Fragment() {
                     Log.e("Camera", "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-                    Log.d("Camera", msg)
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    AddPost.image = BitmapFactory.decodeStream(
+                        requireContext().contentResolver.openInputStream(output.savedUri!!)
+                    ).rotate(90F)
+                    File(getRealPathFromURI(output.savedUri!!)!!).delete()
+                    val intent = Intent(requireActivity(), ProfileImageUpload::class.java)
+                    startActivity(intent)
                 }
             }
         )
+    }
+
+    fun Bitmap.rotate(degrees: Float): Bitmap {
+        val matrix = Matrix().apply { postRotate(degrees) }
+        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
 
     private var lensFacing = CameraSelector.DEFAULT_BACK_CAMERA
@@ -104,10 +112,10 @@ class TakePhoto : Fragment() {
         if (lensFacing == CameraSelector.DEFAULT_FRONT_CAMERA) lensFacing =
             CameraSelector.DEFAULT_BACK_CAMERA else if (lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) lensFacing =
             CameraSelector.DEFAULT_FRONT_CAMERA
-        startCamera1()
+            startCamera()
     }
 
-    private fun startCamera1() {
+    private fun startCamera() {
         val cameraFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraFuture.addListener({
             imageCapture = ImageCapture.Builder()
@@ -139,8 +147,23 @@ class TakePhoto : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
+    fun getRealPathFromURI(contentUri: Uri): String? {
+        val result: String?
+        val cursor: Cursor? =
+            requireActivity().contentResolver.query(contentUri, null, null, null, null)
+        if (cursor == null) {
+            result = contentUri.path
+        } else {
+            cursor.moveToFirst()
+            val idx: Int = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            result = cursor.getString(idx)
+            cursor.close()
+        }
+        return result
+    }
+
     override fun onResume() {
         super.onResume()
-        startCamera1()
+        startCamera()
     }
 }

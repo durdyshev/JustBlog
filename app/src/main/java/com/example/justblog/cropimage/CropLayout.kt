@@ -22,6 +22,7 @@ import androidx.annotation.MainThread
 import com.example.justblog.R
 import com.example.justblog.cropimage.*
 import com.example.justblog.main.ui.AddPost
+import com.example.justblog.main.ui.MainActivity
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.thread
 import kotlin.math.ceil
@@ -61,10 +62,15 @@ class CropLayout @JvmOverloads constructor(
             addView(defaultCropImageView, 0)
             cropImageView = defaultCropImageView
 
-            @OverlayShape val overlayShape = a.getInt(
+            @OverlayShape val overlayShape =if (MainActivity.navController.currentDestination?.id == R.id.profile){
+                2
+            }else{
+                1
+            }
+               /* a.getInt(
                 R.styleable.CropLayout_cropme_overlay_shape,
                 DEFAULT_OVERLAY_SHAPE
-            )
+            )*/
             // Propagate attrs as cropOverlayAttrs so that CropOverlay's custom attributes are transferred,
             // but standard attributes (e.g. background) are not.
             // Inspired from https://github.com/google/ExoPlayer/blob/r2.10.6/library/ui/src/main/java/com/google/android/exoplayer2/ui/PlayerView.java#L464

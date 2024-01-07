@@ -22,17 +22,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/_3sdp"
+                android:layout_marginEnd="@dimen/_3sdp"
                 android:layout_weight="3"
                 android:gravity="center"
-                android:layout_marginEnd="@dimen/_3sdp"
-                android:layout_marginStart="@dimen/_3sdp"
                 android:orientation="vertical">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/fragment_profile_profile_imageview"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:layout_height="@dimen/_70sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:imageFromUrl="@{profileInfo.profileImg}"
                     android:src="@drawable/noun_profile_1051511"
                     tools:ignore="NestedWeights" />
@@ -41,6 +41,7 @@
                     android:id="@+id/fragment_profile_profile_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:text="@{profileInfo.name}"
                     android:textAlignment="center" />
 
@@ -48,7 +49,6 @@
                     android:id="@+id/fragment_profile_profile_username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:text="@{profileInfo.username}"
                     android:textAlignment="center" />
 
@@ -56,7 +56,6 @@
                     android:id="@+id/fragment_profile_profile_motto"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:text="@{profileInfo.motto}"
                     android:textAlignment="center" />
             </LinearLayout>

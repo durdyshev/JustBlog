@@ -13,6 +13,7 @@ import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.justblog.databinding.ActivityPostSettingsBinding
+import com.example.justblog.main.ui.AddPost
 import com.example.justblog.main.ui.MainActivity
 import com.example.justblog.utils.UserCheck
 import com.google.firebase.firestore.FieldValue
@@ -28,7 +29,6 @@ import java.util.*
 class PostSettings : AppCompatActivity() {
     private lateinit var binding: ActivityPostSettingsBinding
     private lateinit var view: View
-    private lateinit var image: String
     private lateinit var storageReference: StorageReference
     private lateinit var userCheck: UserCheck
     private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -50,13 +50,13 @@ class PostSettings : AppCompatActivity() {
             val currentHourString = sdf.format(Date())
             val pathHash = CryptAndHashAlgorithm.Hash.md5(currentHourString)
 
-            val bitmap = (binding.postSettingsImageview.drawable as BitmapDrawable).bitmap
+            val bitmap = AddPost.image
             val baos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
             val originalImage = baos.toByteArray()
 
             val baosCompress = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baosCompress)
+            bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, baosCompress)
             val compressed = baosCompress.toByteArray()
 
             val uploadOriginalImgPath = storageReference.child("post_images/${pathHash}.jpg")
@@ -101,7 +101,6 @@ class PostSettings : AppCompatActivity() {
 
                                                    dialog.show()*/
                                                 val intent = Intent(this, MainActivity::class.java)
-                                                deleteImage(image)
                                                 startActivity(intent)
                                             }
                                             binding.postSettingsProgress.visibility = View.GONE
@@ -117,23 +116,14 @@ class PostSettings : AppCompatActivity() {
             }
         }
         binding.backButton.setOnClickListener {
-            deleteImage(image)
             onBackPressedDispatcher.onBackPressed()
-        }
-    }
-
-    private fun deleteImage(image: String) {
-        val file = File(getExternalFilesDir("/temp/"), "$image.jpg")
-        if (file.exists()) {
-            file.delete()
         }
     }
 
     private fun initThis() {
         userCheck= UserCheck(this)
         storageReference = FirebaseStorage.getInstance().reference;
-        image = intent.getStringExtra("image")!!
-        binding.postSettingsImageview.setImageBitmap(fileToBitmap(image))
+        binding.postSettingsImageview.setImageBitmap(AddPost.image)
 
         binding.postSettingsAddDesc.addTextChangedListener(object : TextWatcher {
 
@@ -149,15 +139,5 @@ class PostSettings : AppCompatActivity() {
                 binding.postSettingsCounter.text = (280 - s!!.length).toString()
             }
         })
-    }
-
-    private fun fileToBitmap(path: String): Bitmap? {
-        val file = File(getExternalFilesDir("/temp/"), "$path.jpg")
-        return if (file.exists()) {
-            BitmapFactory.decodeFile(file.path)
-        } else {
-            null
-        }
-
     }
 }

@@ -10,6 +10,5 @@ class MainActivityViewModel(application: Application): BaseViewModel(application
     val text=MutableLiveData<String>()
 
     fun getFirebaseAuth(){
-        text.value="haha"
     }
 }

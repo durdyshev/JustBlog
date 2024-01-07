@@ -26,9 +26,8 @@ class CircleCropOverlay @JvmOverloads constructor(
 
     val frameWidth = frameRect.width()
     val frameHeight = frameRect.height()
-    val radius = maxOf(frameWidth, frameHeight) / 2f
-
-    canvas.drawCircle(x, y, radius, paint)
+    val radius = maxOf(frameWidth, frameHeight) / 2.5f
+    canvas.drawCircle(this.width/2f, this.height/2f, radius, paint)
   }
 
   override fun drawBorder(canvas: Canvas, paint: Paint) {
@@ -43,21 +42,21 @@ class CircleCropOverlay @JvmOverloads constructor(
 
     val cx = measuredWidth / 2f
     val cy = measuredHeight / 2f
-    val radius = maxOf(frameWidth, frameHeight) / 2f
-    canvas.drawCircle(cx, cy, radius, paint)
+    val radius = maxOf(frameWidth, frameHeight) / 2.5f
+    canvas.drawCircle(this.width/2f, this.height/2f, radius, paint)
 
     // x^2 + y^2 = z^2
-    val x = radius / 3
+    val x = radius / 2
     val z = radius
     val y = sqrt(z.pow(2) - (x).pow(2))
     val d = radius - y
 
-    val borderHeight = frameHeight / 3
+    /*val borderHeight = frameHeight / 3
     canvas.drawLine(left + d, top + borderHeight, right - d, top + borderHeight, paint)
     canvas.drawLine(left + d, top + borderHeight * 2, right - d, top + borderHeight * 2, paint)
 
     val borderWidth = frameWidth / 3
     canvas.drawLine(left + borderWidth, top + d, left + borderWidth, bottom - d, paint)
     canvas.drawLine(left + borderWidth * 2, top + d, left + borderWidth * 2, bottom - d, paint)
-  }
+*/  }
 }

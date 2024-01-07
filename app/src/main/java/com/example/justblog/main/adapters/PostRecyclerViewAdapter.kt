@@ -47,15 +47,14 @@ class PostRecyclerViewAdapter(
             val item = postDataArrayList[position]
             async {
                 firebaseFirestore.collection("users")
-                    .document(item.user_id!!).get()
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            val name = it.result.getString("name").toString()
-                            val profileImg = it.result.getString("profile_img").toString()
+                    .document(item.user_id!!).addSnapshotListener { value, error ->
+                        if (error == null) {
+                            val name = value?.get("name").toString()
+                            val imgUrl = value?.get("profile_img").toString()
                             holder.view.name = name
-                            holder.view.profileImg = profileImg
-
+                            holder.view.profileImg = imgUrl
                         }
+
                     }
             }.await()
             holder.view.compImg = item.comp_url

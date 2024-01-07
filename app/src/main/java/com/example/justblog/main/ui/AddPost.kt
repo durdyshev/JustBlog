@@ -4,7 +4,6 @@ package com.example.justblog.main.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -15,21 +14,16 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.justblog.CryptAndHashAlgorithm
-import com.example.justblog.ImageStatus
 import com.example.justblog.PostSettings
+import com.example.justblog.ProfileImageUpload
 import com.example.justblog.R
 import com.example.justblog.RecyclerViewPicAdapter
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentAddPostBinding
 import com.example.justblog.main.model.Bucket
 import com.example.justblog.main.viewmodel.AddPostViewModel
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.storage.FirebaseStorage
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -103,19 +97,14 @@ class AddPost : Fragment() {
         binding.cropView.addOnCropListener(object : OnCropListener {
             @SuppressLint("SimpleDateFormat")
             override fun onSuccess(bitmap: Bitmap) {
-
-                val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                val currentHourString = sdf.format(Date())
-                val pathHash = CryptAndHashAlgorithm.Hash.md5(currentHourString)
-                if (state == ImageStatus.PROFILE) {
-                    addPostViewModel.saveImg()
-                }else{
-                    imageViewBitmapToFile(bitmap, pathHash)
+                if (MainActivity.navController.currentDestination?.id == R.id.profile
+                ) {
+                    val intent = Intent(requireContext(), ProfileImageUpload::class.java)
+                    startActivity(intent)
+                } else {
                     val intent = Intent(requireContext(), PostSettings::class.java)
-                    intent.putExtra("image", pathHash)
                     startActivity(intent)
                 }
-
 
 
             }
@@ -166,10 +155,8 @@ class AddPost : Fragment() {
     }
 
 
-
     companion object {
         var image: Bitmap? = null
-        var state = ImageStatus.POST
     }
 
 
