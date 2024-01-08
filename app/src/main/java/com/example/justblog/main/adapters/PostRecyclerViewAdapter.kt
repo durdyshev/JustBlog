@@ -43,8 +43,8 @@ class PostRecyclerViewAdapter(
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = postDataArrayList[position]
         CoroutineScope(Dispatchers.IO).launch {
-            val item = postDataArrayList[position]
             async {
                 firebaseFirestore.collection("users")
                     .document(item.user_id!!).addSnapshotListener { value, error ->
@@ -60,12 +60,6 @@ class PostRecyclerViewAdapter(
             holder.view.compImg = item.comp_url
             holder.view.postDate = item.date
             holder.view.desc = item.description
-
-
-            holder.itemView.setOnClickListener {
-                onClickItem?.invoke(item)
-            }
-
 
             firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
                 .addSnapshotListener { value, _ ->
@@ -87,31 +81,34 @@ class PostRecyclerViewAdapter(
                         holder.view.heartBoolean = task.result.exists()
                     }
                 }
-
-            holder.view.postLayoutItemLike.setOnClickListener {
-                firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
-                    .document(userCheck.userId()!!).get().addOnCompleteListener {
-                        if (!it.result.exists()) {
-                            val likeMap: MutableMap<String, Any> = HashMap()
-                            likeMap["date"] = FieldValue.serverTimestamp()
-                            firebaseFirestore.collection("/users/${item.user_id}/posts")
-                                .document(item.postId)
-                                .collection("Likes").document(userCheck.userId()!!).set(likeMap)
-                            CoroutineScope(Dispatchers.Main).launch {
-                                holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_24)
-                            }
-                        } else {
-                            firebaseFirestore.collection("/users/${item.user_id}/posts")
-                                .document(item.postId)
-                                .collection("Likes").document(userCheck.userId()!!).delete()
-                            CoroutineScope(Dispatchers.Main).launch {
-                                holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_border_24)
-                            }
-
-                        }
-                    }
-            }
         }
+        holder.itemView.setOnClickListener {
+            onClickItem?.invoke(item)
+        }
+        holder.view.postLayoutItemLike.setOnClickListener {
+            firebaseFirestore.collection("/users/${item.user_id}/posts/${item.postId}/Likes")
+                .document(userCheck.userId()!!).get().addOnCompleteListener {
+                    if (!it.result.exists()) {
+                        val likeMap: MutableMap<String, Any> = HashMap()
+                        likeMap["date"] = FieldValue.serverTimestamp()
+                        firebaseFirestore.collection("/users/${item.user_id}/posts")
+                            .document(item.postId)
+                            .collection("Likes").document(userCheck.userId()!!).set(likeMap)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_24)
+                        }
+                    } else {
+                        firebaseFirestore.collection("/users/${item.user_id}/posts")
+                            .document(item.postId)
+                            .collection("Likes").document(userCheck.userId()!!).delete()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_border_24)
+                        }
+
+                    }
+                }
+        }
+
     }
 
     inner class ViewHolder(var view: PostLayoutItemBinding) : RecyclerView.ViewHolder(view.root) {
