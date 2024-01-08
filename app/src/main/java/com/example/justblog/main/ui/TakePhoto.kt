@@ -90,9 +90,15 @@ class TakePhoto : Fragment() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    AddPost.image = BitmapFactory.decodeStream(
-                        requireContext().contentResolver.openInputStream(output.savedUri!!)
-                    ).rotate(90F)
+                    AddPost.image =if (lensFacing==CameraSelector.DEFAULT_BACK_CAMERA){
+                        BitmapFactory.decodeStream(
+                            requireContext().contentResolver.openInputStream(output.savedUri!!)
+                        ).rotate(90F)
+                    }else{
+                        BitmapFactory.decodeStream(
+                            requireContext().contentResolver.openInputStream(output.savedUri!!)
+                        ).rotate(270F)
+                    }
                     File(getRealPathFromURI(output.savedUri!!)!!).delete()
                     val intent = Intent(requireActivity(), ProfileImageUpload::class.java)
                     startActivity(intent)

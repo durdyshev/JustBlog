@@ -121,7 +121,7 @@ class UserProfile : Fragment() {
                                 } else {
                                     Toast.makeText(
                                         requireContext(),
-                                        "Problem occured:${it.exception}",
+                                        "Problem occurred:${it.exception}",
                                         Toast.LENGTH_LONG
                                     ).show()
                                     binding.userProfileAddFriendLinear.isEnabled = true

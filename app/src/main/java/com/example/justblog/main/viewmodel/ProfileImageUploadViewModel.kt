@@ -59,7 +59,7 @@ class ProfileImageUploadViewModel(application: Application) : BaseViewModel(appl
                         if (task.isSuccessful) {
                             uploadCompressedImg.downloadUrl.addOnSuccessListener {
                                 val profile: MutableMap<String, Any> = HashMap()
-                                profile["profile_img"] = originalImgString
+                                profile["profile_img"] = it.toString()
 
                                 firebaseFirestore.collection("users").document(userCheck.userId()!!)
                                     .update(profile).addOnCompleteListener {

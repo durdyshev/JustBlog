@@ -85,7 +85,7 @@ class PostSettings : AppCompatActivity() {
                                         binding.postSettingsAddDesc.text.toString()
                                     postMap["user_id"] = userCheck.userId()!!
                                     postMap["date"] = FieldValue.serverTimestamp()
-                                    postMap["type"] = "post"
+                                    postMap["type"] = "photo"
                                     postMap["image_url"] = originalImgString
 
                                     firebaseFirestore.collection("users").document(userCheck.userId()!!)
