@@ -7,10 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justblog.R
 import com.example.justblog.databinding.FragmentUserProfileBinding
@@ -19,10 +19,9 @@ import com.example.justblog.main.adapters.ProfileSelectMenuRecyclerAdapter
 import com.example.justblog.main.model.PostData
 import com.example.justblog.main.model.ProfileData
 import com.example.justblog.main.model.ProfileSelectData
+import com.example.justblog.main.viewmodel.UserProfileViewModel
 import com.example.justblog.utils.UserCheck
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import java.util.HashMap
 
 
 class UserProfile : Fragment() {
@@ -36,8 +35,10 @@ class UserProfile : Fragment() {
     private var tempPostList = arrayListOf<PostData>()
     private var firebaseFirestore = FirebaseFirestore.getInstance()
     private lateinit var userCheck: UserCheck
+    private lateinit var userProfileViewModel: UserProfileViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
         initThis()
 
     }
@@ -49,7 +50,6 @@ class UserProfile : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentUserProfileBinding.inflate(layoutInflater, container, false)
-
         binding.profileInfo = profileData
         initClickListeners()
         initRecyclerView()
@@ -62,90 +62,32 @@ class UserProfile : Fragment() {
         userCheck = UserCheck(requireContext())
         profileData = requireArguments().get("profileData") as ProfileData
 
-        firebaseFirestore.collection("/users/${userCheck.userId()}/friends")
-            .document(profileData.userId!!).get().addOnCompleteListener {
-                if (it.result.exists()) {
-                    when (it.result.getString("status")) {
-                        "0" -> {
-                            binding.userProfileAddFriendTextview.text = "Friend Request"
-                            binding.userProfileAddFriendLinear.background =
-                                ContextCompat.getDrawable(
-                                    requireContext(),
-                                    R.drawable.ic_main_button_background
-                                )
-                        }
-                        "1" -> {
-                            binding.userProfileAddFriendTextview.text = "Friend"
-                            binding.userProfileAddFriendLinear.background =
-                                ContextCompat.getDrawable(
-                                    requireContext(),
-                                    R.drawable.ic_main_button_background
-                                )
-                        }
-                    }
-                } else if (userCheck.userId() == profileData.userId) {
-                    binding.userProfileAddFriendHeaderLinear.visibility = View.GONE
-                } else {
-                    binding.userProfileAddFriendTextview.text = "Add Friend"
-                    binding.userProfileAddFriendLinear.background =
-                        ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.ic_arena_recyclerview_linear_layout_textview_background
-                        )
-                }
+        if (userCheck.userId() == profileData.userId) {
+            binding.userProfileAddFriendHeaderLinear.visibility = View.GONE
+        } else {
+            userProfileViewModel.friendExistenceCheck(userCheck, profileData)
+            userProfileViewModel.statusString.observe(this) {
+                binding.userProfileAddFriendTextview.text = it
             }
+            userProfileViewModel.imageValue.observe(this) {
+                binding.userProfileAddFriendLinear.background =
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        it
+                    )
+            }
+        }
     }
 
     private fun initClickListeners() {
         binding.userProfileAddFriendLinear.setOnClickListener {
-            binding.userProfileAddFriendLinear.isEnabled = false
-            firebaseFirestore.collection("/users/${userCheck.userId()}/friends")
-                .document(profileData.userId!!).get().addOnCompleteListener {
-                    if (!it.result.exists()) {
-
-                        val likeMap: MutableMap<String, Any> = HashMap()
-                        likeMap["date"] = FieldValue.serverTimestamp()
-                        likeMap["status"] = "0"
-                        firebaseFirestore.collection("/users/${userCheck.userId()}/friends")
-                            .document(profileData.userId!!).set(likeMap)
-                        firebaseFirestore.collection("/users/${profileData.userId}/friends")
-                            .document(userCheck.userId()!!).set(likeMap).addOnCompleteListener {
-                                if (it.isSuccessful) {
-                                    binding.userProfileAddFriendLinear.background =
-                                        ContextCompat.getDrawable(
-                                            requireContext(),
-                                            R.drawable.ic_main_button_background
-                                        )
-                                    binding.userProfileAddFriendTextview.text = "Friend Request"
-                                    binding.userProfileAddFriendLinear.isEnabled = true
-                                } else {
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "Problem occurred:${it.exception}",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    binding.userProfileAddFriendLinear.isEnabled = true
-                                }
-                            }
-                    } else {
-                        firebaseFirestore.collection("/users/${userCheck.userId()}/friends")
-                            .document(profileData.userId!!).delete()
-                        firebaseFirestore.collection("/users/${profileData.userId}/friends")
-                            .document(userCheck.userId()!!).delete().addOnCompleteListener {
-
-                                binding.userProfileAddFriendTextview.text = "Add Friend"
-                                binding.userProfileAddFriendLinear.background =
-                                    ContextCompat.getDrawable(
-                                        requireContext(),
-                                        R.drawable.ic_arena_recyclerview_linear_layout_textview_background
-                                    )
-                                binding.userProfileAddFriendLinear.isEnabled = true
-
-                            }
-                    }
-                }
+            userProfileViewModel.userProfileClick(userCheck, profileData, requireContext())
+            userProfileViewModel.buttonEnable.observe(viewLifecycleOwner) {
+                binding.userProfileAddFriendLinear.isEnabled = it
+            }
         }
     }
+
 
     private fun initSelectRecyclerView() {
         val item1 = ProfileSelectData("Posts")
@@ -191,9 +133,11 @@ class UserProfile : Fragment() {
                         newArrayList.addAll(newList)
                         postRecyclerViewAdapter.updateItems(newArrayList)
                     }
+
                     1 -> {
                         postRecyclerViewAdapter.updateItems(sortList("photo"))
                     }
+
                     2 -> {
                         postRecyclerViewAdapter.updateItems(sortList("video"))
                     }
@@ -207,50 +151,18 @@ class UserProfile : Fragment() {
         postDataArrayList = ArrayList()
         firebaseFirestore = FirebaseFirestore.getInstance()
 
-        firebaseFirestore.collection("/users/${profileData.userId}/posts/").get()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    for (documentSnapshot in it.result) {
-                        val postId = documentSnapshot.id
-                        val compUrl = documentSnapshot.getString("comp_url")
-                        val description = documentSnapshot.getString("description")
-                        val imageUrl = documentSnapshot.getString("image_url")
-                        val type = documentSnapshot.getString("type")
-                        val userId = documentSnapshot.getString("user_id")
-                        val date = documentSnapshot.getTimestamp("date")
-                        val postData =
-                            PostData(
-                                postId,
-                                compUrl,
-                                description,
-                                imageUrl,
-                                type,
-                                userId,
-                                date!!.toDate()
-                            )
-                        postDataArrayList.add(postData)
-                    }
+        postRecyclerViewAdapter = PostRecyclerViewAdapter(requireContext(), postDataArrayList)
+        binding.fragmentProfileProfilePostRecyclerview.layoutManager = LinearLayoutManager(
+            requireContext(),
+            LinearLayoutManager.VERTICAL, false
+        )
+        binding.fragmentProfileProfilePostRecyclerview.adapter = postRecyclerViewAdapter
 
-                    val newList = postDataArrayList.sortedWith(compareBy { it.date }).reversed()
-                    val newArrayList = java.util.ArrayList<PostData>()
-                    newArrayList.addAll(newList)
-                    postRecyclerViewAdapter =
-                        PostRecyclerViewAdapter(requireContext(), newArrayList)
-                    binding.fragmentProfileProfilePostRecyclerview.layoutManager =
-                        LinearLayoutManager(
-                            requireContext(),
-                            LinearLayoutManager.VERTICAL,
-                            false
-                        )
-                    binding.fragmentProfileProfilePostRecyclerview.adapter =
-                        postRecyclerViewAdapter
-
-                }
-            }
-
-
+        userProfileViewModel.getUserPosts(profileData)
+        userProfileViewModel.postDataArrayList.observe(viewLifecycleOwner) {
+            postRecyclerViewAdapter.updateItems(it)
+        }
     }
-
     fun sortList(type: String): ArrayList<PostData> {
         tempPostList.clear()
         for (hey in postDataArrayList) {

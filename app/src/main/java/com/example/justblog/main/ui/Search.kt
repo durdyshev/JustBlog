@@ -86,7 +86,7 @@ class Search : Fragment() {
     private fun search(p0: String) {
         searchList.clear()
 
-        firebaseFirestore.collection("users").orderBy("lower_username").orderBy("name").startAt(p0)
+        firebaseFirestore.collection("users").orderBy("lower_username").startAt(p0)
             .endAt(p0 + "\uf8ff").addSnapshotListener { value, error ->
 
                 if (error != null) {

@@ -9,14 +9,14 @@
 
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/bottom_sheet_email"
+        android:id="@+id/bottom_sheet_accept_friend"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_30sdp"
         android:layout_marginStart="@dimen/_24sdp"
         android:layout_marginTop="@dimen/_6sdp"
         android:layout_marginEnd="@dimen/_24sdp"
         android:background="@drawable/edit_text_background"
-        android:hint="Take A Photo"
+        android:hint="Accept"
         android:inputType="textEmailAddress"
         android:maxLength="25"
         android:paddingLeft="@dimen/_7sdp"
@@ -27,14 +27,14 @@
         tools:ignore="HardcodedText" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/bottom_sheet_pass"
+        android:id="@+id/bottom_sheet_decline_friend"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_30sdp"
         android:layout_marginStart="@dimen/_24sdp"
         android:layout_marginTop="@dimen/_8sdp"
         android:layout_marginEnd="@dimen/_24sdp"
         android:background="@drawable/edit_text_background"
-        android:hint="Get From Gallery"
+        android:hint="Decline"
         android:maxLength="25"
         android:paddingLeft="@dimen/_7sdp"
         android:paddingRight="@dimen/_7sdp"

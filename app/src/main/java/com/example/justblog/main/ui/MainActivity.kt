@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -21,6 +20,7 @@ import com.example.justblog.R
 import com.example.justblog.databinding.ActivityMainBinding
 import com.example.justblog.login.ui.Login
 import com.example.justblog.main.viewmodel.MainActivityViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -40,6 +40,11 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         findViewById<BottomNavigationView>(R.id.bottom_navigation)
             .setupWithNavController(navController)
+        val profileButton=binding.bottomNavigation.findViewById<BottomNavigationItemView>(R.id.profile)
+        profileButton.setOnLongClickListener {
+            mainActivityViewModel.showSelectImageDialog(this@MainActivity,R.layout.bottom_sheet_sign_out)
+            true
+        }
 
         mainActivityViewModel=ViewModelProvider(this)[MainActivityViewModel::class.java]
         mainActivityViewModel.getFirebaseAuth()
@@ -51,18 +56,18 @@ class MainActivity : AppCompatActivity() {
 
     }
     private fun observeLiveData() {
-        mainActivityViewModel.currentUserValue.observe(this, Observer {
+        mainActivityViewModel.currentUserValue.observe(this) {
             it?.let {
-             if(it==null){
+                if (it == null) {
 
-             }
+                }
             }
-        })
-        mainActivityViewModel.text.observe(this, Observer {
+        }
+        mainActivityViewModel.text.observe(this) {
             it.let {
-                Toast.makeText(this,it,Toast.LENGTH_LONG).show()
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
-        })
+        }
     }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)

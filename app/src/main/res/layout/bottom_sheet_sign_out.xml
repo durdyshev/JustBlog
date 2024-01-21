@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/radius_dialog"
+    android:layout_marginBottom="@dimen/_8sdp">
+
+    <LinearLayout
+        android:id="@+id/auth_linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/bottom_sheet_sign_out"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginStart="@dimen/_24sdp"
+            android:layout_marginTop="@dimen/_6sdp"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:background="@drawable/edit_text_background"
+            android:hint="Sign Out"
+            android:inputType="textEmailAddress"
+            android:maxLength="25"
+            android:paddingLeft="@dimen/_7sdp"
+            android:layout_marginBottom="@dimen/_8sdp"
+            android:paddingRight="@dimen/_7sdp"
+            android:textColor="#B8B8B8"
+            android:textColorHint="#707073"
+            android:textSize="@dimen/_10sdp"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/bottom_sheet_pass"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginStart="@dimen/_24sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_24sdp"
+            android:background="@drawable/edit_text_background"
+            android:hint="Get From Gallery"
+            android:maxLength="25"
+            android:paddingLeft="@dimen/_7sdp"
+            android:paddingRight="@dimen/_7sdp"
+            android:textColor="#B8B8B8"
+            android:textColorHint="#707073"
+            android:textSize="@dimen/_10sdp"
+            tools:ignore="HardcodedText"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>
