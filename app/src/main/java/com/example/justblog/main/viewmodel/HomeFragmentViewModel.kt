@@ -11,9 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
 class HomeFragmentViewModel(application: Application) : BaseViewModel(application), CoroutineScope {
@@ -33,7 +31,7 @@ class HomeFragmentViewModel(application: Application) : BaseViewModel(applicatio
         CoroutineScope(Dispatchers.IO).launch { getAllPosts() }
     }
 
-    private suspend fun getAllPosts(): ArrayList<PostData>? {
+    private suspend fun getAllPosts(){
         val postDataArray = ArrayList<PostData>()
         val friendsList = ArrayList<String>()
         friendsList.add(userCheck.userId()!!)
@@ -85,6 +83,5 @@ class HomeFragmentViewModel(application: Application) : BaseViewModel(applicatio
                     }
             }
         }
-        return null
     }
 }

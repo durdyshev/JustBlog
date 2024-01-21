@@ -3,13 +3,17 @@ package com.example.justblog.main.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -44,8 +48,13 @@ class AddPost : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentAddPostBinding.inflate(layoutInflater, container, false)
-        val view = binding.root
+        if (requestRuntimePermission()) {
+            initThis()
+        }
+        return binding.root
+    }
 
+    private fun initThis() {
         addPostViewModel = ViewModelProvider(this)[AddPostViewModel::class.java]
         addPostViewModel.getAllDirectories()
 
@@ -129,17 +138,6 @@ class AddPost : Fragment() {
             }
             binding.cropView.crop()
         })
-        return view
-    }
-
-    private fun imageViewBitmapToFile(bitmap: Bitmap, time: String): File {
-        val file =
-            File(requireContext().getExternalFilesDir("/temp/"), "$time.jpg")
-        val fOut = FileOutputStream(file, false)
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut)
-        fOut.flush()
-        fOut.close()
-        return file
     }
 
     private fun initRecyclerView(list: ArrayList<String>) {
@@ -154,10 +152,71 @@ class AddPost : Fragment() {
 
     }
 
+    //For requesting permission
+    private fun requestRuntimePermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    13
+                )
+                return false
+            }
+        }
+        //android 13 permission request
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.READ_MEDIA_IMAGES
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES),
+                    13
+                )
+                return false
+            }
+        }
+        return true
+    }
+
+    @Deprecated("Deprecated in Java")
+    @RequiresApi(Build.VERSION_CODES.R)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 13) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+                initThis()
+            } else
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    13
+                )
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (requestRuntimePermission()) {
+            initThis()
+        }
+    }
 
     companion object {
         var image: Bitmap? = null
     }
-
-
 }

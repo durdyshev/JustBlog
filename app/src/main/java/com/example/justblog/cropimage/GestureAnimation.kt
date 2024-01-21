@@ -27,16 +27,22 @@ internal class GestureAnimation(
     }
 
     override fun onScroll(
-      initialEvent: MotionEvent, currentEvent: MotionEvent, dx: Float, dy: Float
+      e1: MotionEvent?,
+      e2: MotionEvent,
+      distanceX: Float,
+      distanceY: Float
     ): Boolean {
-      actionListener.onMoved(-dx, -dy)
+      actionListener.onMoved(-distanceX, -distanceY)
       return true
     }
 
-    override fun onLongPress(e: MotionEvent) = Unit
 
+    override fun onLongPress(e: MotionEvent) = Unit
     override fun onFling(
-      e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float
+      e1: MotionEvent?,
+      e2: MotionEvent,
+      velocityX: Float,
+      velocityY: Float
     ): Boolean {
       actionListener.onFlinged(velocityX, velocityY)
       return true

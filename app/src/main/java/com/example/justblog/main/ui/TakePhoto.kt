@@ -2,6 +2,7 @@ package com.example.justblog.main.ui
 
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,12 +15,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.justblog.ProfileImageUpload
@@ -45,6 +49,13 @@ class TakePhoto : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTakePhotoBinding.inflate(layoutInflater, container, false)
+        if (requestRuntimePermission()){
+            initThis()
+        }
+        return binding.root
+    }
+
+    private fun initThis() {
         startCamera()
         binding.takePhoto.setOnClickListener {
             takePhoto()
@@ -52,7 +63,6 @@ class TakePhoto : Fragment() {
         binding.flipCamera.setOnClickListener {
             flipCamera()
         }
-        return binding.root
     }
 
     private fun takePhoto() {
@@ -90,11 +100,11 @@ class TakePhoto : Fragment() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    AddPost.image =if (lensFacing==CameraSelector.DEFAULT_BACK_CAMERA){
+                    AddPost.image = if (lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) {
                         BitmapFactory.decodeStream(
                             requireContext().contentResolver.openInputStream(output.savedUri!!)
                         ).rotate(90F)
-                    }else{
+                    } else {
                         BitmapFactory.decodeStream(
                             requireContext().contentResolver.openInputStream(output.savedUri!!)
                         ).rotate(270F)
@@ -118,7 +128,7 @@ class TakePhoto : Fragment() {
         if (lensFacing == CameraSelector.DEFAULT_FRONT_CAMERA) lensFacing =
             CameraSelector.DEFAULT_BACK_CAMERA else if (lensFacing == CameraSelector.DEFAULT_BACK_CAMERA) lensFacing =
             CameraSelector.DEFAULT_FRONT_CAMERA
-            startCamera()
+        startCamera()
     }
 
     private fun startCamera() {
@@ -168,8 +178,67 @@ class TakePhoto : Fragment() {
         return result
     }
 
+    private fun requestRuntimePermission(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.CAMERA
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(android.Manifest.permission.CAMERA),
+                    13
+                )
+                return false
+            }
+        }
+        //android 13 permission request
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.CAMERA
+                )
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(android.Manifest.permission.CAMERA),
+                    13
+                )
+                return false
+            }
+        }
+        return true
+    }
+
+    @Deprecated("Deprecated in Java")
+    @RequiresApi(Build.VERSION_CODES.R)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 13) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+                initThis()
+            } else
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    13
+                )
+        }
+    }
+
+
     override fun onResume() {
         super.onResume()
-        startCamera()
+        if (requestRuntimePermission()){
+            initThis()
+        }
     }
 }
