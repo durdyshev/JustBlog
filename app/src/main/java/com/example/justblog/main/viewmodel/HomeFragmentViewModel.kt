@@ -35,36 +35,52 @@ class HomeFragmentViewModel(application: Application) : BaseViewModel(applicatio
 
     private suspend fun getAllPosts(): ArrayList<PostData>? {
         val postDataArray = ArrayList<PostData>()
+        val friendsList = ArrayList<String>()
+        friendsList.add(userCheck.userId()!!)
         CoroutineScope(Dispatchers.IO).launch {
             if (mAuth.currentUser != null) {
-                firebaseFirestore.collection("/users/${userCheck.userId()}/posts/").get()
-                    .addOnCompleteListener {
+                firebaseFirestore.collection("users").document(userCheck.userId()!!)
+                    .collection("friends").whereEqualTo("status", "2")
+                    .get().addOnCompleteListener {
                         if (it.isSuccessful) {
                             for (documentSnapshot in it.result) {
-                                val postId = documentSnapshot.id
-                                val compUrl = documentSnapshot.getString("comp_url")
-                                val description = documentSnapshot.getString("description")
-                                val imageUrl = documentSnapshot.getString("image_url")
-                                val type = documentSnapshot.getString("type")
-                                val userId = documentSnapshot.getString("user_id")
-                                val date = documentSnapshot.getTimestamp("date")
-                                val postData =
-                                    PostData(
-                                        postId,
-                                        compUrl,
-                                        description,
-                                        imageUrl,
-                                        type,
-                                        userId,
-                                        date!!.toDate()
-                                    )
-                                postDataArray.add(postData)
+                                friendsList.add(documentSnapshot.id)
                             }
+                        }
+                        friendsList.forEach {
+                            firebaseFirestore.collection("posts").whereEqualTo("user_id", it).get()
+                                .addOnCompleteListener {
+                                    if (it.isSuccessful) {
+                                        for (documentSnapshot in it.result) {
+                                            val postId = documentSnapshot.id
+                                            val compUrl = documentSnapshot.getString("comp_url")
+                                            val description =
+                                                documentSnapshot.getString("description")
+                                            val imageUrl = documentSnapshot.getString("image_url")
+                                            val type = documentSnapshot.getString("type")
+                                            val userId = documentSnapshot.getString("user_id")
+                                            val date = documentSnapshot.getTimestamp("date")
+                                            val postData =
+                                                PostData(
+                                                    postId,
+                                                    compUrl,
+                                                    description,
+                                                    imageUrl,
+                                                    type,
+                                                    userId,
+                                                    date!!.toDate()
+                                                )
+                                            postDataArray.add(postData)
+                                        }
 
-                            val newList = postDataArray.sortedWith(compareBy { it.date }).reversed()
-                            val newArrayList = java.util.ArrayList<PostData>()
-                            newArrayList.addAll(newList)
-                            postArrayList.value = newArrayList
+                                        val newList =
+                                            postDataArray.sortedWith(compareBy { it.date })
+                                                .reversed()
+                                        val newArrayList = java.util.ArrayList<PostData>()
+                                        newArrayList.addAll(newList)
+                                        postArrayList.value = newArrayList
+                                    }
+                                }
                         }
                     }
             }

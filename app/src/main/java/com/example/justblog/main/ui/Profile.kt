@@ -179,7 +179,7 @@ class Profile : Fragment() {
         firebaseFirestore = FirebaseFirestore.getInstance()
 
         if (mAuth!!.currentUser != null) {
-            firebaseFirestore.collection("/users/${userCheck.userId()}/posts/").get()
+            firebaseFirestore.collection("posts").whereEqualTo("user_id",userCheck.userId()).get()
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         for (documentSnapshot in it.result) {

@@ -225,7 +225,7 @@ class UserProfileViewModel(application: Application) : BaseViewModel(application
     fun getUserPosts(profileData: ProfileData) {
 
         val postDataArrayList = ArrayList<PostData>()
-        firebaseFirestore.collection("/users/${profileData.userId}/posts/").get()
+        firebaseFirestore.collection("posts").whereEqualTo("user_id",profileData.userId).get()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     for (documentSnapshot in it.result) {
