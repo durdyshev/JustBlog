@@ -4,37 +4,34 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
-import androidx.compose.ui.text.toLowerCase
 import androidx.lifecycle.MutableLiveData
 import com.example.justblog.BaseViewModel
-import com.example.justblog.FirebaseDb
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 
-class RegisterViewModel(application: Application): BaseViewModel(application) {
+class RegisterViewModel(application: Application) : BaseViewModel(application) {
 
-    val registerText=MutableLiveData<String>()
-    val registerResult=MutableLiveData<Boolean>()
-    val checkEmailResult=MutableLiveData<Boolean>()
-    val checkEmailString=MutableLiveData<String>()
-    val checkUserResult=MutableLiveData<Int>()
-    val checkUserString=MutableLiveData<String>()
-    private val mAuth: FirebaseAuth= FirebaseAuth.getInstance()
-    private val firebaseFirestore:FirebaseFirestore=FirebaseFirestore.getInstance()
-    private val sharedPreferences:SharedPreferences=application.getSharedPreferences("UserInfo",Context.MODE_PRIVATE)
-    private val sharedEditor:Editor=sharedPreferences.edit()
-    private val firebaseDb=FirebaseDb(application)
+    val registerText = MutableLiveData<String>()
+    val registerResult = MutableLiveData<Boolean>()
+    val checkEmailResult = MutableLiveData<Boolean>()
+    val checkEmailString = MutableLiveData<String>()
+    val checkUserResult = MutableLiveData<Int>()
+    val checkUserString = MutableLiveData<String>()
+    private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val sharedPreferences: SharedPreferences =
+        application.getSharedPreferences("UserInfo", Context.MODE_PRIVATE)
+    private val sharedEditor: Editor = sharedPreferences.edit()
 
-    fun registerUser(email: String, password: String,name:String,username: String) {
+    fun registerUser(email: String, password: String, name: String, username: String) {
 
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-            if(it.isSuccessful){
+            if (it.isSuccessful) {
                 val userId: String = mAuth.currentUser!!.uid
                 val deviceToken = FirebaseMessaging.getInstance().token
-                sharedEditor.putString("userId",userId)
+                sharedEditor.putString("userId", userId)
                 sharedEditor.apply()
-
                 val userMap: MutableMap<String, Any> = HashMap()
                 userMap["token"] = deviceToken
                 userMap["userId"] = userId
@@ -48,20 +45,18 @@ class RegisterViewModel(application: Application): BaseViewModel(application) {
                 userMap["phone"] = ""
                 firebaseFirestore.collection("users").document(userId).set(
                     userMap
-                ).addOnCompleteListener { task->
-                    if(task.isSuccessful){
-                        registerResult.value=true
-                        registerText.value="Account has been created!"
-                    }
-                    else{
-                        registerResult.value=false
-                        registerText.value="Problem has occurred!"
+                ).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        registerResult.value = true
+                        registerText.value = "Account has been created!"
+                    } else {
+                        registerResult.value = false
+                        registerText.value = "Problem has occurred!"
                     }
                 }
-            }
-            else {
-                registerResult.value=false
-                registerText.value="Problem has occurred!"
+            } else {
+                registerResult.value = false
+                registerText.value = "Problem has occurred!"
             }
         }
 
@@ -70,27 +65,25 @@ class RegisterViewModel(application: Application): BaseViewModel(application) {
     fun checkEmailExistsOrNot(emailText: String) {
 
         mAuth.fetchSignInMethodsForEmail(emailText.trim()).addOnCompleteListener {
-            if(it.result.signInMethods!!.size==0){
-                //registerUser(emailText)
-                checkEmailResult.value=true
-
-            }
-            else{
-                checkEmailResult.value=false
-                checkEmailString.value="Email is already in use!"
+            if (it.result.signInMethods!!.size == 0) {
+                checkEmailResult.value = true
+            } else {
+                checkEmailResult.value = false
+                checkEmailString.value = "Email is already in use!"
             }
         }
     }
-    fun checkUserNameExistsOrNot(username: String) {
-        firebaseFirestore.collection("users").whereEqualTo("username",username).get().addOnCompleteListener {
-            if(!it.result.isEmpty){
-                checkUserResult.value=it.result.size()
-                checkUserString.value="Username is already in use!"
-            }
-            else{
-                checkUserResult.value=0
 
+    fun checkUserNameExistsOrNot(username: String) {
+        firebaseFirestore.collection("users").whereEqualTo("username", username).get()
+            .addOnCompleteListener {
+                if (!it.result.isEmpty) {
+                    checkUserResult.value = it.result.size()
+                    checkUserString.value = "Username is already in use!"
+                } else {
+                    checkUserResult.value = 0
+
+                }
             }
-        }
     }
 }

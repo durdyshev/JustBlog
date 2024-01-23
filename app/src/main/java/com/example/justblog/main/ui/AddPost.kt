@@ -21,13 +21,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.justblog.PostSettings
 import com.example.justblog.ProfileImageUpload
 import com.example.justblog.R
-import com.example.justblog.RecyclerViewPicAdapter
+import com.example.justblog.main.adapters.RecyclerViewPicAdapter
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentAddPostBinding
 import com.example.justblog.main.model.Bucket
 import com.example.justblog.main.viewmodel.AddPostViewModel
 import java.io.File
-import java.io.FileOutputStream
 import java.util.*
 
 

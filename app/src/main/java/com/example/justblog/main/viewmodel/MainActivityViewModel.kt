@@ -1,5 +1,6 @@
 package com.example.justblog.main.viewmodel
 
+import android.app.Activity
 import android.app.Application
 import android.app.Dialog
 import android.content.Context
@@ -20,6 +21,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.security.AccessController.getContext
+
 
 class MainActivityViewModel(application: Application) : BaseViewModel(application) {
     val currentUserValue = MutableLiveData<FirebaseUser?>()
@@ -30,7 +33,7 @@ class MainActivityViewModel(application: Application) : BaseViewModel(applicatio
     fun getFirebaseAuth() {
     }
 
-    fun showSelectImageDialog(context: Context,layoutId: Int) {
+    fun showSelectImageDialog(context: Context, layoutId: Int) {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(layoutId)
@@ -45,14 +48,22 @@ class MainActivityViewModel(application: Application) : BaseViewModel(applicatio
         val signOut = dialog.findViewById<Button>(R.id.bottom_sheet_sign_out)
         signOut.setOnClickListener {
             CoroutineScope(Dispatchers.Main).launch {
-                signOut(context)
+                signOut(context,dialog)
             }
         }
     }
 
-    private suspend fun signOut(context: Context) {
+    private suspend fun signOut(context: Context, dialog: Dialog) {
         CoroutineScope(Dispatchers.Main).async { return@async firebaseAuth.signOut() }.await()
-        val intent=Intent(context,Login::class.java)
+        dialog.dismiss()
+        val intent = Intent(context, Login::class.java)
         context.startActivity(intent)
+        try {
+            val activity = context as Activity
+            activity.finish()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 }

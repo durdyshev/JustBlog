@@ -1,4 +1,4 @@
-package com.example.justblog
+package com.example.justblog.main.adapters
 
 
 import android.annotation.SuppressLint
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.justblog.R
 
 
 class RecyclerViewPicAdapter(

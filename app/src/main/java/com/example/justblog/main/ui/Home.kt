@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.justblog.CryptAndHashAlgorithm
 import com.example.justblog.PostSettings
 import com.example.justblog.R
-import com.example.justblog.RecyclerViewPicAdapter
+import com.example.justblog.main.adapters.RecyclerViewPicAdapter
 import com.example.justblog.cropimage.CropLayout
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentHomeBinding
