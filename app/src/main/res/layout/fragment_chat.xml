@@ -1,14 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Chat">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    android:orientation="vertical"
+    tools:context="com.example.justblog.main.ui.Chat">
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appCompatTextView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Chat" />
+        android:layout_height="@dimen/_40sdp"
+        android:gravity="center|start"
+        android:paddingStart="@dimen/_8sdp"
+        android:paddingEnd="@dimen/_8sdp"
+        android:text="JustBlog"
+        android:textColor="#707073"
 
-</FrameLayout>
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
+    <LinearLayout
+        android:id="@+id/chat_linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_30sdp"
+        android:layout_margin="@dimen/_5sdp"
+        android:background="@drawable/edit_text_background_white"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <SearchView
+            android:id="@+id/chat_search_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.4"
+            android:baselineAligned="false"
+            android:closeIcon="@drawable/car_ui_icon_close"
+            android:gravity="end"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search"
+            android:searchIcon="@null"
+            android:theme="@style/SearchViewStyle"
+            app:defaultQueryHint="Search"
+            app:searchHintIcon="@null" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chat_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

@@ -49,7 +49,7 @@ class Search : Fragment() {
 
             val bundle = Bundle()
             bundle.putParcelable("profileData", it)
-            MainActivity.navController.navigate(R.id.userProfile, bundle)
+            HomeParent.navController.navigate(R.id.userProfile, bundle)
         }
     }
 

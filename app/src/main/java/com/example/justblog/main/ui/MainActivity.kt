@@ -1,73 +1,40 @@
 package com.example.justblog.main.ui
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import com.example.justblog.R
+import androidx.lifecycle.MutableLiveData
+import com.example.justblog.MainFragmentPager
 import com.example.justblog.databinding.ActivityMainBinding
 import com.example.justblog.login.ui.Login
-import com.example.justblog.main.viewmodel.MainActivityViewModel
-import com.google.android.material.bottomnavigation.BottomNavigationItemView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var adapter: MainFragmentPager
     private lateinit var binding: ActivityMainBinding
     private lateinit var view: View
-    private lateinit var navHostFragment:NavHostFragment
-    private lateinit var mainActivityViewModel: MainActivityViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivityMainBinding.inflate(layoutInflater)
         view=binding.root
         setContentView(view)
         hideSystemUI()
-        navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        findViewById<BottomNavigationView>(R.id.bottom_navigation)
-            .setupWithNavController(navController)
-        val profileButton=binding.bottomNavigation.findViewById<BottomNavigationItemView>(R.id.profile)
-        profileButton.setOnLongClickListener {
-            mainActivityViewModel.showSelectImageDialog(this@MainActivity,R.layout.bottom_sheet_sign_out)
-            true
+
+        adapter = MainFragmentPager(supportFragmentManager, lifecycle)
+        binding.mainViewpager.adapter = adapter
+        binding.mainViewpager.setCurrentItem(1,false)
+        viewPagerEnable.observe(this){
+            binding.mainViewpager.isUserInputEnabled=it
         }
 
-        mainActivityViewModel=ViewModelProvider(this)[MainActivityViewModel::class.java]
-        mainActivityViewModel.getFirebaseAuth()
-        observeLiveData()
-    }
-    companion object{
-        @SuppressLint("StaticFieldLeak")
-        lateinit var navController: NavController
 
-    }
-    private fun observeLiveData() {
-        mainActivityViewModel.currentUserValue.observe(this) {
-            it?.let {
-                if (it == null) {
-
-                }
-            }
-        }
-        mainActivityViewModel.text.observe(this) {
-            it.let {
-                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
-            }
-        }
     }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
@@ -109,4 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-  }
+    companion object {
+        var viewPagerEnable=MutableLiveData(true)
+    }
+}

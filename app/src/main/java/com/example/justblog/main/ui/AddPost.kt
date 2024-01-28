@@ -105,7 +105,7 @@ class AddPost : Fragment() {
         binding.cropView.addOnCropListener(object : OnCropListener {
             @SuppressLint("SimpleDateFormat")
             override fun onSuccess(bitmap: Bitmap) {
-                if (MainActivity.navController.currentDestination?.id == R.id.profile
+                if (HomeParent.navController.currentDestination?.id == R.id.profile
                 ) {
                     val intent = Intent(requireContext(), ProfileImageUpload::class.java)
                     startActivity(intent)

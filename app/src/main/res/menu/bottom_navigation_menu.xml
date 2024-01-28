@@ -4,8 +4,7 @@
         android:id="@+id/home2"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_home_24"
-        android:title="@null"
-      />
+        android:title="@null" />
     <item
         android:id="@+id/search"
         android:enabled="true"
@@ -15,12 +14,6 @@
         android:id="@+id/addPost"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_add_circle_outline_24"
-        android:title="@null" />
-
-    <item
-        android:id="@+id/chat"
-        android:enabled="true"
-        android:icon="@drawable/ic_baseline_send_24"
         android:title="@null" />
 
     <item

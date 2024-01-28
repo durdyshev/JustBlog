@@ -21,18 +21,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.security.AccessController.getContext
 
 
-class MainActivityViewModel(application: Application) : BaseViewModel(application) {
-    val currentUserValue = MutableLiveData<FirebaseUser?>()
-    val text = MutableLiveData<String>()
-    val application1 = application
+class HomeParentViewModel(application: Application) : BaseViewModel(application) {
     private val firebaseAuth = FirebaseAuth.getInstance()
-
-    fun getFirebaseAuth() {
-    }
-
     fun showSelectImageDialog(context: Context, layoutId: Int) {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

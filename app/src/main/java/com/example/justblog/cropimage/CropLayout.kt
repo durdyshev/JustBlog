@@ -22,6 +22,7 @@ import androidx.annotation.MainThread
 import com.example.justblog.R
 import com.example.justblog.cropimage.*
 import com.example.justblog.main.ui.AddPost
+import com.example.justblog.main.ui.HomeParent
 import com.example.justblog.main.ui.MainActivity
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.thread
@@ -62,7 +63,7 @@ class CropLayout @JvmOverloads constructor(
             addView(defaultCropImageView, 0)
             cropImageView = defaultCropImageView
 
-            @OverlayShape val overlayShape =if (MainActivity.navController.currentDestination?.id == R.id.profile){
+            @OverlayShape val overlayShape =if (HomeParent.navController.currentDestination?.id == R.id.profile){
                 2
             }else{
                 1
