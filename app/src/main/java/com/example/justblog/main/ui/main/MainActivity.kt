@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.ui.main
 
 import android.content.Intent
 import android.os.Bundle

@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.justblog.databinding.ActivityProfileImageUploadBinding
-import com.example.justblog.main.ui.AddPost
-import com.example.justblog.main.ui.MainActivity
+import com.example.justblog.main.ui.addpost.AddPost
+import com.example.justblog.main.ui.main.MainActivity
 import com.example.justblog.main.viewmodel.ProfileImageUploadViewModel
 
 class ProfileImageUpload : AppCompatActivity() {
@@ -41,7 +41,7 @@ class ProfileImageUpload : AppCompatActivity() {
                 ImageLoading.IS_SUCCESSFUL->{
                     Toast.makeText(this,"Image Upload Successful!!!",Toast.LENGTH_LONG).show()
                     binding.profileImageUploadProgress.visibility= View.GONE
-                    val intent= Intent(this,MainActivity::class.java)
+                    val intent= Intent(this, MainActivity::class.java)
                     startActivity(intent)
                 }
                 else -> {}

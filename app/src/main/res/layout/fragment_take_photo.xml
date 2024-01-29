@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".main.ui.TakePhoto">
+    tools:context=".main.ui.profile.TakePhoto">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/appCompatTextView"

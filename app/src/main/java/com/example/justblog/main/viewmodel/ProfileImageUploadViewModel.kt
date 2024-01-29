@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.justblog.BaseViewModel
 import com.example.justblog.CryptAndHashAlgorithm
 import com.example.justblog.ImageLoading
-import com.example.justblog.main.ui.AddPost
+import com.example.justblog.main.ui.addpost.AddPost
 import com.example.justblog.utils.UserCheck
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage

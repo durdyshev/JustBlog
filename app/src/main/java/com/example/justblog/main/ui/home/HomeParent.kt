@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.ui.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -12,6 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.justblog.R
 import com.example.justblog.databinding.FragmentHomeParentBinding
+import com.example.justblog.main.ui.main.MainActivity
 import com.example.justblog.main.viewmodel.HomeParentViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 
@@ -30,13 +31,13 @@ class HomeParent : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        homeParentViewModel= ViewModelProvider(this)[HomeParentViewModel::class.java]
         binding = FragmentHomeParentBinding.inflate(layoutInflater, container, false)
 
         navHostFragment =
             childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         binding.bottomNavigation.setupWithNavController(navController)
+        homeParentViewModel= ViewModelProvider(this)[HomeParentViewModel::class.java]
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             if (controller.currentDestination?.id == R.id.home2) {
                 binding.homeParentIconsLinear.visibility = View.VISIBLE

@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.ui.search
 
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +12,7 @@ import com.example.justblog.R
 import com.example.justblog.databinding.FragmentSearchBinding
 import com.example.justblog.main.adapters.SearchRecyclerAdapter
 import com.example.justblog.main.model.ProfileData
+import com.example.justblog.main.ui.home.HomeParent
 import com.google.firebase.firestore.FirebaseFirestore
 
 

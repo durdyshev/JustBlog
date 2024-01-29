@@ -4,26 +4,16 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ContentResolver
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
-import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.example.justblog.BaseViewModel
-import com.example.justblog.CryptAndHashAlgorithm
 import com.example.justblog.main.model.Bucket
-import com.example.justblog.main.ui.AddPost
-import com.example.justblog.main.ui.MainActivity
 import com.example.justblog.utils.UserCheck
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.*
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.HashMap
 import kotlin.coroutines.CoroutineContext
 
 

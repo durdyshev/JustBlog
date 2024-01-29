@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.ui.profile
 
 import android.content.ContentValues
 import android.content.Intent
@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.justblog.ProfileImageUpload
 import com.example.justblog.databinding.FragmentTakePhotoBinding
+import com.example.justblog.main.ui.addpost.AddPost
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale

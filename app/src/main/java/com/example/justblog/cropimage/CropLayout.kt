@@ -20,10 +20,8 @@ import android.widget.ImageView
 import androidx.annotation.IntDef
 import androidx.annotation.MainThread
 import com.example.justblog.R
-import com.example.justblog.cropimage.*
-import com.example.justblog.main.ui.AddPost
-import com.example.justblog.main.ui.HomeParent
-import com.example.justblog.main.ui.MainActivity
+import com.example.justblog.main.ui.addpost.AddPost
+import com.example.justblog.main.ui.home.HomeParent
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.concurrent.thread
 import kotlin.math.ceil

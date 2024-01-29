@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.ui.addpost
 
 
 import android.annotation.SuppressLint
@@ -25,6 +25,7 @@ import com.example.justblog.main.adapters.RecyclerViewPicAdapter
 import com.example.justblog.cropimage.OnCropListener
 import com.example.justblog.databinding.FragmentAddPostBinding
 import com.example.justblog.main.model.Bucket
+import com.example.justblog.main.ui.home.HomeParent
 import com.example.justblog.main.viewmodel.AddPostViewModel
 import java.io.File
 import java.util.*

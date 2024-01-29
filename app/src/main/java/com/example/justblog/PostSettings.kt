@@ -3,25 +3,21 @@ package com.example.justblog
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.justblog.databinding.ActivityPostSettingsBinding
-import com.example.justblog.main.ui.AddPost
-import com.example.justblog.main.ui.MainActivity
+import com.example.justblog.main.ui.addpost.AddPost
+import com.example.justblog.main.ui.main.MainActivity
 import com.example.justblog.utils.UserCheck
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 

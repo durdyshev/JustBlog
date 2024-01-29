@@ -15,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.justblog.databinding.ActivityRegisterBinding
-import com.example.justblog.main.ui.MainActivity
+import com.example.justblog.main.ui.main.MainActivity
 import com.example.justblog.register.viewmodel.RegisterViewModel
 
 

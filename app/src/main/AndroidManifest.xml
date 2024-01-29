@@ -64,7 +64,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".main.ui.MainActivity"
+            android:name=".main.ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

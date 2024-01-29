@@ -2,6 +2,7 @@ package com.example.justblog.main.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.justblog.R
 import com.example.justblog.databinding.PostLayoutItemBinding
 import com.example.justblog.main.model.PostData
+import com.example.justblog.main.ui.home.HomeParent.Companion.navController
 import com.example.justblog.utils.UserCheck
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.CoroutineScope
@@ -61,21 +63,21 @@ class PostRecyclerViewAdapter(
             holder.view.postDate = item.date
             holder.view.desc = item.description
 
-            firebaseFirestore.collection("posts/${item.postId}/Likes")
+            firebaseFirestore.collection("posts/${item.postId}/likes")
                 .addSnapshotListener { value, _ ->
                     CoroutineScope(Dispatchers.Main).launch {
                         holder.view.likesCount = value!!.size()
                     }
                 }
 
-            firebaseFirestore.collection("posts/${item.postId}/Comments")
+            firebaseFirestore.collection("posts/${item.postId}/comments")
                 .addSnapshotListener { value, _ ->
                     CoroutineScope(Dispatchers.Main).launch {
                         holder.view.commentsCount = value!!.size()
                     }
                 }
 
-            firebaseFirestore.collection("posts/${item.postId}/Likes")
+            firebaseFirestore.collection("posts/${item.postId}/likes")
                 .document(userCheck.userId()!!).get().addOnCompleteListener { task ->
                     CoroutineScope(Dispatchers.Main).launch {
                         holder.view.heartBoolean = task.result.exists()
@@ -85,8 +87,13 @@ class PostRecyclerViewAdapter(
         holder.itemView.setOnClickListener {
             onClickItem?.invoke(item)
         }
+        holder.view.postLayoutItemComment.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putString("postId", item.postId)
+            navController.navigate(R.id.comments, bundle)
+        }
         holder.view.postLayoutItemLike.setOnClickListener {
-            firebaseFirestore.collection("posts/${item.postId}/Likes")
+            firebaseFirestore.collection("posts/${item.postId}/likes")
                 .document(userCheck.userId()!!).get().addOnCompleteListener {
                     if (!it.result.exists()) {
                         val likeMap: MutableMap<String, Any> = HashMap()

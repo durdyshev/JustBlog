@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.ui.profile
 
 import android.annotation.SuppressLint
 import android.app.Dialog

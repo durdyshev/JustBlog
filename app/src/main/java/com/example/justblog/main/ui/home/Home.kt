@@ -1,4 +1,4 @@
-package com.example.justblog.main.ui
+package com.example.justblog.main.ui.home
 
 import android.Manifest
 import android.annotation.SuppressLint

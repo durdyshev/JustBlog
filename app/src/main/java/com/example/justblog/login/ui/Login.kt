@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.justblog.databinding.ActivityLoginBinding
 import com.example.justblog.login.viewmodel.LoginViewModel
-import com.example.justblog.main.ui.MainActivity
+import com.example.justblog.main.ui.main.MainActivity
 import com.example.justblog.register.ui.Register
 
 class Login : AppCompatActivity() {
