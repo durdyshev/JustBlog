@@ -42,6 +42,7 @@ class ProfileImageUpload : AppCompatActivity() {
                     Toast.makeText(this,"Image Upload Successful!!!",Toast.LENGTH_LONG).show()
                     binding.profileImageUploadProgress.visibility= View.GONE
                     val intent= Intent(this, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 }
                 else -> {}
