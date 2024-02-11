@@ -100,14 +100,14 @@ class PostRecyclerViewAdapter(
                         likeMap["date"] = FieldValue.serverTimestamp()
                         firebaseFirestore.collection("posts")
                             .document(item.postId)
-                            .collection("Likes").document(userCheck.userId()!!).set(likeMap)
+                            .collection("likes").document(userCheck.userId()!!).set(likeMap)
                         CoroutineScope(Dispatchers.Main).launch {
                             holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_24)
                         }
                     } else {
                         firebaseFirestore.collection("posts")
                             .document(item.postId)
-                            .collection("Likes").document(userCheck.userId()!!).delete()
+                            .collection("likes").document(userCheck.userId()!!).delete()
                         CoroutineScope(Dispatchers.Main).launch {
                             holder.view.postLayoutItemLike.setImageResource(R.drawable.baseline_favorite_border_24)
                         }

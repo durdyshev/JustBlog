@@ -84,8 +84,7 @@ class PostSettings : AppCompatActivity() {
                                     postMap["type"] = "photo"
                                     postMap["image_url"] = originalImgString
 
-                                    firebaseFirestore.collection("users").document(userCheck.userId()!!)
-                                        .collection("posts").add(postMap).addOnCompleteListener {
+                                    firebaseFirestore.collection("posts").add(postMap).addOnCompleteListener {
                                             if (it.isSuccessful) {
                                                 /*   val dialog: LottieDialog = LottieDialog(this)
                                                        .setAnimation(R.raw.done)
@@ -97,7 +96,9 @@ class PostSettings : AppCompatActivity() {
 
                                                    dialog.show()*/
                                                 val intent = Intent(this, MainActivity::class.java)
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                                                 startActivity(intent)
+                                                this.finish()
                                             }
                                             binding.postSettingsProgress.visibility = View.GONE
                                             binding.postSettingsAddDesc.isEnabled = true
