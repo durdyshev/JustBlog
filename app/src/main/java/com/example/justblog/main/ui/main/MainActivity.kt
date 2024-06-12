@@ -11,6 +11,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.viewpager2.widget.ViewPager2
 import com.example.justblog.MainFragmentPager
 import com.example.justblog.databinding.ActivityMainBinding
 import com.example.justblog.login.ui.Login
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         viewPagerEnable.observe(this){
             binding.mainViewpager.isUserInputEnabled=it
         }
+        mainViewPager=binding.mainViewpager
 
 
     }
@@ -78,5 +80,6 @@ class MainActivity : AppCompatActivity() {
     }
     companion object {
         var viewPagerEnable=MutableLiveData(true)
+        lateinit var mainViewPager:ViewPager2
     }
 }

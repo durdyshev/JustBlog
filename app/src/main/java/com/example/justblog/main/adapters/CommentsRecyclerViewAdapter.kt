@@ -3,27 +3,17 @@ package com.example.justblog.main.adapters
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.justblog.R
 import com.example.justblog.databinding.CommentLayoutItemBinding
-import com.example.justblog.databinding.PostLayoutItemBinding
 import com.example.justblog.main.model.CommentData
-import com.example.justblog.main.model.PostData
-import com.example.justblog.main.model.ProfileSelectData
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.util.*
-import kotlin.collections.ArrayList
 
 class CommentsRecyclerViewAdapter(
     val context: Context,

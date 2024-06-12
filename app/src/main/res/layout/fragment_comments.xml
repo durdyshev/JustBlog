@@ -35,10 +35,11 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/comments_profile_circle_imageview"
             android:layout_width="@dimen/_35sdp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="bottom"
+            android:layout_marginStart="@dimen/_5sdp"
             android:foregroundGravity="bottom"
-            android:src="@drawable/noun_profile_1051511" />
+            android:src="@drawable/person_circle" />
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/comments_enter_edittext"

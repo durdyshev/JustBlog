@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.justblog.main.ui.chat.Chat">
+    tools:context=".presentation.views.new_message_friend_list.NewMessageFriendList">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/back_arrow"
+            android:id="@+id/new_message_friend_list_back_arrow"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.42"
@@ -30,22 +30,22 @@
             android:layout_height="@dimen/_40sdp"
             android:layout_gravity="center"
             android:layout_weight="0.16"
-            android:gravity="center|start|bottom"
+            android:gravity="start|bottom"
             android:paddingStart="@dimen/_8sdp"
             android:paddingEnd="@dimen/_8sdp"
-            android:text="Chat"
+            android:text="New Message"
             android:textColor="#707073"
             android:textSize="25sp"
             android:textStyle="bold"
             tools:ignore="HardcodedText" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/chat_pencil_square"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0.44"
             android:padding="@dimen/_8sdp"
-            android:src="@drawable/pencil_square" />
+            android:src="@drawable/pencil_square"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <LinearLayout
@@ -76,7 +76,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chat_recyclerview"
+        android:id="@+id/new_message_friend_list_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -4,16 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.ui.main.MainActivity">
+    tools:context=".main.ui.chat.ChatParent">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/main_viewpager"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/chat_parent_nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/chat_nav" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

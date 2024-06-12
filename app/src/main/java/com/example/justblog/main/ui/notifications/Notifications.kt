@@ -1,16 +1,14 @@
-package com.example.justblog.main.ui.chat
+package com.example.justblog.main.ui.notifications
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.justblog.R
-import com.example.justblog.databinding.FragmentChatBinding
+import com.example.justblog.databinding.FragmentNotificationsBinding
 
-
-class Chat : Fragment() {
-    private lateinit var binding: FragmentChatBinding
+class Notifications : Fragment() {
+    private lateinit var binding: FragmentNotificationsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -20,11 +18,7 @@ class Chat : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding = FragmentChatBinding.inflate(layoutInflater,container,false)
-        binding.chatPencilSquare.setOnClickListener {
-            ChatParent.navController.navigate(R.id.newMessageFriendList2)
-        }
+        binding = FragmentNotificationsBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
-
 }

@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.justblog.main.ui.addpost.AddPost
-import com.example.justblog.main.ui.chat.Chat
+import com.example.justblog.main.ui.chat.ChatParent
 import com.example.justblog.main.ui.home.HomeParent
 
 private const val NUM_TABS = 3
@@ -23,7 +23,7 @@ class MainFragmentPager(fragmentManager: FragmentManager, lifecycle: Lifecycle) 
         when (position) {
             0 -> return AddPost()
             1 -> return HomeParent()
-            2 -> return Chat()
+            2 -> return ChatParent()
         }
         return HomeParent()
     }

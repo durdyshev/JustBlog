@@ -48,5 +48,10 @@
             app:argType="string" />
 
     </fragment>
+    <fragment
+        android:id="@+id/notifications"
+        android:name="com.example.justblog.main.ui.notifications.Notifications"
+        android:label="fragment_notifications"
+        tools:layout="@layout/fragment_notifications" />
 
 </navigation>
