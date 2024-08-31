@@ -6,7 +6,8 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 
 interface SendMessageRepository {
-    suspend fun getMessages(usersIds: List<String>): Query
-    suspend fun sendMessage(hashMap: HashMap<Any, Any>): Task<DocumentReference>
-
+    suspend fun getMessages(chatRoomId: String, usersIds: List<String>): Query
+    suspend fun sendMessage(chatRoomId: String, hashMap: HashMap<Any, Any>): Task<DocumentReference>
+    suspend fun createChatRoom(chatRoomId: String, hashMap: HashMap<Any, Any>): Task<Void>
+    suspend fun checkChatRoom(chatRoomId: String): Query
 }

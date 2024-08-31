@@ -9,12 +9,26 @@ import com.google.firebase.firestore.Query
 class SendMessageRepositoryImpl(
     private val sendMessageService: SendMessageService
 ) : SendMessageRepository {
-    override suspend fun getMessages(usersIds: List<String>): Query {
-        return sendMessageService.getMessageList(usersIds)
+    override suspend fun getMessages(chatRoomId: String, usersIds: List<String>): Query {
+        return sendMessageService.getMessageList(chatRoomId, usersIds)
     }
 
-    override suspend fun sendMessage(hashMap: HashMap<Any, Any>): Task<DocumentReference> {
-        return sendMessageService.sendMessage(hashMap)
+    override suspend fun sendMessage(
+        chatRoomId: String,
+        hashMap: HashMap<Any, Any>
+    ): Task<DocumentReference> {
+        return sendMessageService.sendMessage(chatRoomId, hashMap)
+    }
+
+    override suspend fun createChatRoom(
+        chatRoomId: String,
+        hashMap: HashMap<Any, Any>
+    ): Task<Void> {
+        return sendMessageService.createChatRoom(chatRoomId, hashMap)
+    }
+
+    override suspend fun checkChatRoom(chatRoomId: String): Query {
+        return sendMessageService.checkChatRoom(chatRoomId)
     }
 
 

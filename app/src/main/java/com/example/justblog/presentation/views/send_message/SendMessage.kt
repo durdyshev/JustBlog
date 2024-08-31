@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 class SendMessage : Fragment() {
     private lateinit var binding: FragmentSendMessageBinding
     private lateinit var friendId: String
+    private lateinit var chatRoomId: String
     private lateinit var sendMessageViewModel: SendMessageViewModel
     private lateinit var sendMessageRecyclerViewAdapter: SendMessageRecyclerViewAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +35,7 @@ class SendMessage : Fragment() {
     ): View {
         friendId = requireArguments().get("friendId") as String
         sendMessageViewModel =
-            SendMessageViewModel(listOf(FirebaseAuth.getInstance().uid?:"", friendId))
+            SendMessageViewModel(listOf(FirebaseAuth.getInstance().uid ?: "", friendId))
         binding = FragmentSendMessageBinding.inflate(inflater, container, false)
         initClickListener()
         initThis()
@@ -48,6 +49,7 @@ class SendMessage : Fragment() {
         binding.sendMessageSendButton.setOnClickListener {
             if (!TextUtils.isEmpty(binding.sendMessageEditText.text)) {
                 sendMessageViewModel.sendMessage(
+                    chatRoomId,
                     sendMessageViewModel.createHashMap(
                         FirebaseAuth.getInstance().uid,
                         friendId,
@@ -62,12 +64,30 @@ class SendMessage : Fragment() {
     private fun initThis() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                sendMessageViewModel.messageState.collect { uiState ->
-                    println("boy "+uiState.messageList.size)
-                    if (uiState.messageList.size != 0) {
-                        initRecyclerView(uiState.messageList)
+                chatRoomId = sendMessageViewModel.chatRoomIdForString()
+                launch {
+                    sendMessageViewModel.chatState.collect { chatState ->
+                        if (!chatState.success) {
+                            sendMessageViewModel.createChatRoom(
+                                chatRoomId,
+                                sendMessageViewModel.createChatHashMap(
+                                    chatRoomId,
+                                    FirebaseAuth.getInstance().uid ?: ""
+                                )
+                            )
+                        }
                     }
                 }
+                launch {
+                    sendMessageViewModel.messageState.collect { uiState ->
+                        println("boy " + uiState.messageList.size)
+                        if (uiState.messageList.size != 0) {
+                            initRecyclerView(uiState.messageList)
+                        }
+                    }
+                }
+
+
             }
         }
     }

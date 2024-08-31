@@ -12,9 +12,9 @@ import java.util.Date
 class GetMessageListCase(
     private val repository: SendMessageRepository
 ) {
-    operator fun invoke(usersId: List<String>) =
+    operator fun invoke(chatRoomId: String, usersId: List<String>) =
         callbackFlow<Resource<ArrayList<MessageData>>> {
-            repository.getMessages(usersId).get().addOnCompleteListener {
+            repository.getMessages(chatRoomId, usersId).get().addOnCompleteListener {
                 if (it.isSuccessful) {
                     trySend(Resource.Success(taskToList(it.result)))
                 } else {

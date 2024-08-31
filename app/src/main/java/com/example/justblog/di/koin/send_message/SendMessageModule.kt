@@ -4,6 +4,8 @@ import com.example.justblog.data.repository.send_message.SendMessageRepositoryIm
 import com.example.justblog.data.service.firebase.send_message.SendMessageService
 import com.example.justblog.domain.repository.send_message.SendMessageRepository
 import com.example.justblog.domain.use_case.GetMessageListCase
+import com.example.justblog.domain.use_case.CheckChatRoomCase
+import com.example.justblog.domain.use_case.CreateChatRoomCase
 import com.example.justblog.domain.use_case.SendMessageCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,6 +21,8 @@ object SendMessageModule {
         singleOf(::SendMessageRepositoryImpl) { bind<SendMessageRepository>() }
         singleOf(::SendMessageCase) { bind<SendMessageCase>() }
         singleOf(::GetMessageListCase) { bind<GetMessageListCase>() }
+        singleOf(::CheckChatRoomCase) { bind<CheckChatRoomCase>() }
+        singleOf(::CreateChatRoomCase) { bind<CreateChatRoomCase>() }
 
     }
 }

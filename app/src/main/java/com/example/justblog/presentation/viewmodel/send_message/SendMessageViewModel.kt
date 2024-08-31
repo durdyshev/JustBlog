@@ -3,8 +3,11 @@ package com.example.justblog.presentation.viewmodel.send_message
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.justblog.data.model.MessageType
+import com.example.justblog.data.state.BooleanState
 import com.example.justblog.data.state.MessageListState
 import com.example.justblog.data.state.MessageSendState
+import com.example.justblog.domain.use_case.CheckChatRoomCase
+import com.example.justblog.domain.use_case.CreateChatRoomCase
 import com.example.justblog.domain.use_case.GetMessageListCase
 import com.example.justblog.domain.use_case.SendMessageCase
 import com.example.justblog.utils.Resource
@@ -18,19 +21,27 @@ import org.koin.core.component.inject
 class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), KoinComponent {
     private val sendMessageCase: SendMessageCase by inject()
     private val getMessageListCase: GetMessageListCase by inject()
+    private val checkChatRoomCase: CheckChatRoomCase by inject()
+    private val createChatRoomCase: CreateChatRoomCase by inject()
     private val _state = MutableStateFlow(MessageSendState())
-    val state: StateFlow<MessageSendState> = _state
+
+    private val _checkChatState = MutableStateFlow(BooleanState())
+    val chatState: StateFlow<BooleanState> = _checkChatState
+
+    private val createChatState = MutableStateFlow(BooleanState())
+    val _createChatState: StateFlow<BooleanState> = createChatState
 
     private val _messageState = MutableStateFlow(MessageListState())
     var messageState: StateFlow<MessageListState> = _messageState
 
     init {
-        getMessageList(usersIds)
+        checkChatRoom(chatRoomIdForString())
+        getMessageList(chatRoomIdForString(), usersIds)
     }
 
-    private fun getMessageList(usersIds: List<String>) {
+    private fun getMessageList(chatRoomId: String, usersIds: List<String>) {
         viewModelScope.launch {
-            getMessageListCase(usersIds).collect { result ->
+            getMessageListCase(chatRoomId, usersIds).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         _messageState.value =
@@ -56,9 +67,9 @@ class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), Ko
         }
     }
 
-    fun sendMessage(hashMap: HashMap<Any, Any>) {
+    fun sendMessage(chatRoomId: String, hashMap: HashMap<Any, Any>) {
         viewModelScope.launch {
-            sendMessageCase(hashMap).collect { result ->
+            sendMessageCase(chatRoomId, hashMap).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         _state.value =
@@ -81,6 +92,65 @@ class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), Ko
         }
     }
 
+    fun createChatRoom(chatRoomId: String, hashMap: HashMap<Any, Any>) {
+        viewModelScope.launch {
+            createChatRoomCase(chatRoomId, hashMap).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        createChatState.value =
+                            BooleanState(
+                                success = result.data ?: false,
+                            )
+
+                    }
+
+                    is Resource.Error -> {
+                        createChatState.value = BooleanState(
+                            error = result.message ?: "An unexpected error occurred!!"
+                        )
+
+                    }
+
+                    is Resource.Loading -> {}
+                }
+            }
+        }
+    }
+
+    private fun checkChatRoom(chatRoomId: String) {
+        viewModelScope.launch {
+            checkChatRoomCase(chatRoomId).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _checkChatState.value =
+                            BooleanState(
+                                success = result.data ?: false,
+                            )
+
+                    }
+
+                    is Resource.Error -> {
+                        _checkChatState.value = BooleanState(
+                            error = result.message ?: "An unexpected error occurred!!"
+                        )
+
+                    }
+
+                    is Resource.Loading -> {}
+                }
+            }
+        }
+    }
+
+    fun chatRoomIdForString(): String {
+        return if (usersIds.first().hashCode() < usersIds.last().hashCode()) {
+            usersIds.first() + "_" + usersIds.last()
+        } else {
+            usersIds.last() + "_" + usersIds.first()
+        }
+    }
+
+
     fun createHashMap(uid: String?, friendId: String, content: String): HashMap<Any, Any> {
         val messageHashMap = HashMap<Any, Any>()
         messageHashMap["senderId"] = uid ?: ""
@@ -91,5 +161,14 @@ class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), Ko
         messageHashMap["isRead"] = false
         messageHashMap["type"] = MessageType.TEXT.name
         return messageHashMap
+    }
+
+    fun createChatHashMap(chatRoomId: String, userId: String): HashMap<Any, Any> {
+        val charRoomMap = HashMap<Any, Any>()
+        charRoomMap["chatRoomId"] = chatRoomId
+        charRoomMap["lastMessageSenderId"] = userId
+        charRoomMap["lastMessageTimestamp"] = FieldValue.serverTimestamp()
+        charRoomMap["users"] = usersIds
+        return charRoomMap
     }
 }
