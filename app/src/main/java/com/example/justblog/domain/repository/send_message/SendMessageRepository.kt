@@ -7,5 +7,5 @@ import com.google.firebase.firestore.Query
 interface SendMessageRepository {
     suspend fun getMessages(chatRoomId:String,usersIds: List<String>): Query
     suspend fun sendMessage(chatRoomId: String,hashMap: HashMap<Any, Any>): Task<DocumentReference>
-
+    suspend fun getProfileData(userId:String): Query
 }

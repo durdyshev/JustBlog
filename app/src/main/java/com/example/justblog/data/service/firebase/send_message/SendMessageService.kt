@@ -6,12 +6,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
 class SendMessageService(val firebaseFirestore: FirebaseFirestore) {
-    fun getMessageList(chatRoomId:String,usersIds: List<String>): Query {
-        println("idler "+usersIds)
-        return firebaseFirestore.collection("chatRooms").document(chatRoomId).collection("messages")
+    fun getMessageList(chatRoomId: String, usersIds: List<String>): Query {
+        println("idler " + usersIds)
+        return firebaseFirestore.collection("chatRooms").document(chatRoomId).collection("messages").orderBy("date")
     }
 
-    fun sendMessage(chatRoomId: String,hashMap: HashMap<Any, Any>): Task<DocumentReference> {
-        return firebaseFirestore.collection("chatRooms").document(chatRoomId).collection("messages").add(hashMap)
+    fun sendMessage(chatRoomId: String, hashMap: HashMap<Any, Any>): Task<DocumentReference> {
+        return firebaseFirestore.collection("chatRooms").document(chatRoomId).collection("messages")
+            .add(hashMap)
+    }
+
+    fun getProfileData(userId: String): Query {
+        return firebaseFirestore.collection("users").whereEqualTo("userId", userId)
     }
 }

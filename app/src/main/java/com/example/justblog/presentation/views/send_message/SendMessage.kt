@@ -10,6 +10,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.justblog.data.model.MessageData
 import com.example.justblog.databinding.FragmentSendMessageBinding
 import com.example.justblog.main.adapters.SendMessageRecyclerViewAdapter
@@ -25,7 +27,7 @@ class SendMessage : Fragment() {
     private lateinit var friendId: String
     private lateinit var sendMessageViewModel: SendMessageViewModel
     private lateinit var sendMessageRecyclerViewAdapter: SendMessageRecyclerViewAdapter
-    private lateinit var userProfile:ProfileData
+    private lateinit var userProfile: ProfileData
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -35,7 +37,8 @@ class SendMessage : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         friendId = requireArguments().get("friendId") as String
-        sendMessageViewModel = SendMessageViewModel(listOf(FirebaseAuth.getInstance().uid?:"", friendId))
+        sendMessageViewModel =
+            SendMessageViewModel(listOf(FirebaseAuth.getInstance().uid ?: "", friendId))
         binding = FragmentSendMessageBinding.inflate(inflater, container, false)
         initClickListener()
         initThis()
@@ -47,14 +50,16 @@ class SendMessage : Fragment() {
             ChatParent.navController.popBackStack()
         }
         binding.sendMessageSendButton.setOnClickListener {
-            if (!TextUtils.isEmpty(binding.sendMessageEditText.text)) {
+            val content = binding.sendMessageEditText.text.toString()
+            if (!TextUtils.isEmpty(content)) {
                 sendMessageViewModel.sendMessage(
                     sendMessageViewModel.createHashMap(
                         FirebaseAuth.getInstance().uid,
                         friendId,
-                        binding.sendMessageEditText.text.toString()
+                        content
                     )
                 )
+                binding.sendMessageEditText.setText("")
             }
 
         }
@@ -63,11 +68,23 @@ class SendMessage : Fragment() {
     private fun initThis() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                sendMessageViewModel.messageState.collect { uiState ->
-                    println("boy "+uiState.messageList.size)
-                    if (uiState.messageList.size != 0) {
-                        initRecyclerView(uiState.messageList)
+                launch {
+                    sendMessageViewModel.messageState.collect { uiState ->
+                        println("boy " + uiState.messageList.size)
+                        if (uiState.messageList.size != 0) {
+                            initRecyclerView(uiState.messageList)
+                        }
                     }
+                }
+                launch {
+                    sendMessageViewModel._friendProfile.collect {
+                        userProfile = it.profileData ?: ProfileData()
+                        Glide.with(binding.newMessageFriendListProfileImg)
+                            .load(it.profileData?.profileImg)
+                            .into(binding.newMessageFriendListProfileImg)
+                        binding.newMessageFriendListUserName.text = it.profileData?.name
+                    }
+
                 }
             }
         }

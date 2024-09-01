@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="@dimen/_3sdp"
     tools:context=".presentation.views.send_message.SendMessage">
 
     <LinearLayout
@@ -21,7 +22,7 @@
             android:id="@+id/new_message_friend_list_back_arrow"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.42"
+            android:layout_weight="0.44"
             android:padding="@dimen/_8sdp"
             android:src="@drawable/ic_baseline_arrow_back_24" />
 
@@ -31,18 +32,20 @@
             android:layout_weight="0.16">
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/new_message_friend_list_profile_img"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.8"
-                android:padding="@dimen/_5sdp"
+                android:padding="@dimen/_3sdp"
                 android:src="@drawable/person_circle" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/new_message_friend_list_user_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/_6sdp"
                 android:layout_weight="0.2"
                 android:gravity="start|center"
-                android:layout_marginStart="@dimen/_2sdp"
                 android:paddingTop="@dimen/_4sdp"
                 android:text="User"
                 android:textColor="#707073"
@@ -76,9 +79,9 @@
         android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_40sdp"
-        android:layout_marginBottom="@dimen/_6sdp"
         android:layout_marginStart="@dimen/_5sdp"
         android:layout_marginEnd="@dimen/_5sdp"
+        android:layout_marginBottom="@dimen/_6sdp"
         android:background="@drawable/send_message_edit_text_background"
         android:orientation="horizontal"
         android:weightSum="1"

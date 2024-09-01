@@ -24,7 +24,7 @@ class GetMessageListCase(
                 }
 
             awaitClose {
-                listenerRegistration.remove() // Clean up the listener when the flow is no longer collected
+                listenerRegistration.remove()
             }
         }
 
@@ -45,6 +45,8 @@ class GetMessageListCase(
                 )
             )
         }
+        friendList.distinctBy { it.id }
+        friendList
         return friendTransformedList
     }
 }

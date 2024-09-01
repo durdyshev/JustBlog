@@ -4,6 +4,7 @@ import com.example.justblog.data.repository.new_message_friend_list.NewMessageFr
 import com.example.justblog.data.service.firebase.new_message_friend_list.NewMessageFriendListService
 import com.example.justblog.domain.repository.new_message_friend_list_repository.NewMessageFriendListRepository
 import com.example.justblog.domain.use_case.GetFriendListFromFirebaseCase
+import com.example.justblog.domain.use_case.GetProfileCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.core.module.dsl.bind
@@ -17,5 +18,6 @@ object GetFriendListModule {
         singleOf(::NewMessageFriendListService) { bind<NewMessageFriendListService>() }
         singleOf(::NewMessageFriendListRepositoryImpl) { bind<NewMessageFriendListRepository>() }
         singleOf(::GetFriendListFromFirebaseCase) { bind<GetFriendListFromFirebaseCase>() }
+        singleOf(::GetProfileCase) { bind<GetProfileCase>() }
     }
 }

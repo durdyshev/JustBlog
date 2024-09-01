@@ -19,4 +19,8 @@ class SendMessageRepositoryImpl(
     ): Task<DocumentReference> {
         return sendMessageService.sendMessage(chatRoomId, hashMap)
     }
+
+    override suspend fun getProfileData(userId: String): Query {
+        return sendMessageService.getProfileData(userId)
+    }
 }

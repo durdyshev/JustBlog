@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.justblog.data.model.MessageType
 import com.example.justblog.data.state.MessageListState
 import com.example.justblog.data.state.MessageSendState
+import com.example.justblog.data.state.ProfileState
 import com.example.justblog.domain.use_case.GetMessageListCase
+import com.example.justblog.domain.use_case.GetProfileCase
 import com.example.justblog.domain.use_case.SendMessageCase
 import com.example.justblog.utils.Resource
 import com.google.firebase.firestore.FieldValue
@@ -18,17 +20,23 @@ import org.koin.core.component.inject
 class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), KoinComponent {
     private val sendMessageCase: SendMessageCase by inject()
     private val getMessageListCase: GetMessageListCase by inject()
+    private val getProfileCase: GetProfileCase by inject()
+
     private val _state = MutableStateFlow(MessageSendState())
     val state: StateFlow<MessageSendState> = _state
 
     private val _messageState = MutableStateFlow(MessageListState())
     var messageState: StateFlow<MessageListState> = _messageState
 
+    private val friendProfile = MutableStateFlow(ProfileState())
+    var _friendProfile: StateFlow<ProfileState> = friendProfile
+
     init {
-        getMessageList(usersIds)
+        getMessageList()
+        getFriendProfile()
     }
 
-    private fun getMessageList(usersIds: List<String>) {
+    private fun getMessageList() {
         viewModelScope.launch {
             getMessageListCase(chatRoomId(), usersIds).collect { result ->
                 when (result) {
@@ -55,8 +63,33 @@ class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), Ko
             }
         }
     }
-    fun getUserProfile(){
 
+    private fun getFriendProfile() {
+        viewModelScope.launch {
+            getProfileCase(usersIds[1]).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        friendProfile.value =
+                            ProfileState(
+                                success = true,
+                                profileData = result.data,
+                            )
+
+                    }
+
+                    is Resource.Error -> {
+                        friendProfile.value = ProfileState(
+                            error = result.message ?: "An unexpected error occurred!!"
+                        )
+
+                    }
+
+                    is Resource.Loading -> {
+                        friendProfile.value = ProfileState(isLoading = true)
+                    }
+                }
+            }
+        }
     }
 
     fun sendMessage(hashMap: HashMap<Any, Any>) {

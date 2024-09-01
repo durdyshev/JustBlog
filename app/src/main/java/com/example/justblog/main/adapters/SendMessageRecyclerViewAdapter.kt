@@ -8,9 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.justblog.R
 import com.example.justblog.data.model.MessageData
+import com.example.justblog.utils.GetTimeAgo
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
 
 class SendMessageRecyclerViewAdapter(
@@ -19,6 +22,8 @@ class SendMessageRecyclerViewAdapter(
 ) : RecyclerView.Adapter<SendMessageRecyclerViewAdapter.ViewHolder>() {
     private var onClickItem: ((MessageData) -> Unit)? = null
     private var userId = FirebaseAuth.getInstance().uid
+    private val firebaseFirestore = FirebaseFirestore.getInstance()
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -42,15 +47,25 @@ class SendMessageRecyclerViewAdapter(
         holder.itemView.setOnClickListener {
             onClickItem!!.invoke(item)
         }
+        firebaseFirestore.collection("users")
+            .document(item.senderId).addSnapshotListener { value, error ->
+                if (error == null) {
+                    Glide.with(holder.circleImageView).load(value?.get("profile_img").toString())
+                        .into(holder.circleImageView)
+                }
+            }
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val circleImageView: CircleImageView = itemView.findViewById(R.id.message_layout_item_circleimageview)
+        val circleImageView: CircleImageView =
+            itemView.findViewById(R.id.message_layout_item_circleimageview)
         private val message: TextView = itemView.findViewById(R.id.message_layout_item_message)
+        private val date: TextView = itemView.findViewById(R.id.message_layout_item_date)
 
         @SuppressLint("SetTextI18n")
         fun bindView(item: MessageData) {
             message.text = item.content
+            date.text = GetTimeAgo.getTimeAgo(item.date.time, context)
         }
 
     }
