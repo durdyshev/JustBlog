@@ -12,17 +12,22 @@ import java.util.Date
 class GetMessageListCase(
     private val repository: SendMessageRepository
 ) {
-    operator fun invoke(usersId: List<String>) =
+    operator fun invoke(chatRoomId:String,usersId: List<String>) =
         callbackFlow<Resource<ArrayList<MessageData>>> {
-            repository.getMessages(usersId).get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    trySend(Resource.Success(taskToList(it.result)))
-                } else {
-                    trySend(Resource.Error(it.exception?.message))
+            val listenerRegistration = repository.getMessages(chatRoomId,usersId)
+                .addSnapshotListener { value, error ->
+                    if (value != null) {
+                        trySend(Resource.Success(taskToList(value))).isSuccess
+                    } else {
+                        trySend(Resource.Error(error?.message)).isSuccess
+                    }
                 }
-            }.await()
-            awaitClose { channel.close() }
+
+            awaitClose {
+                listenerRegistration.remove() // Clean up the listener when the flow is no longer collected
+            }
         }
+
 
     private fun taskToList(friendList: QuerySnapshot): ArrayList<MessageData> {
         val friendTransformedList = ArrayList<MessageData>()

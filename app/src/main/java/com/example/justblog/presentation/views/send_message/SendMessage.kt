@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.justblog.data.model.MessageData
 import com.example.justblog.databinding.FragmentSendMessageBinding
 import com.example.justblog.main.adapters.SendMessageRecyclerViewAdapter
+import com.example.justblog.main.model.ProfileData
 import com.example.justblog.main.ui.chat.ChatParent
 import com.example.justblog.presentation.viewmodel.send_message.SendMessageViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +25,7 @@ class SendMessage : Fragment() {
     private lateinit var friendId: String
     private lateinit var sendMessageViewModel: SendMessageViewModel
     private lateinit var sendMessageRecyclerViewAdapter: SendMessageRecyclerViewAdapter
+    private lateinit var userProfile:ProfileData
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -33,8 +35,7 @@ class SendMessage : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         friendId = requireArguments().get("friendId") as String
-        sendMessageViewModel =
-            SendMessageViewModel(listOf(FirebaseAuth.getInstance().uid?:"", friendId))
+        sendMessageViewModel = SendMessageViewModel(listOf(FirebaseAuth.getInstance().uid?:"", friendId))
         binding = FragmentSendMessageBinding.inflate(inflater, container, false)
         initClickListener()
         initThis()

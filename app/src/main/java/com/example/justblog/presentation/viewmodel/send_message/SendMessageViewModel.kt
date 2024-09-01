@@ -30,7 +30,7 @@ class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), Ko
 
     private fun getMessageList(usersIds: List<String>) {
         viewModelScope.launch {
-            getMessageListCase(usersIds).collect { result ->
+            getMessageListCase(chatRoomId(), usersIds).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         _messageState.value =
@@ -55,10 +55,13 @@ class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), Ko
             }
         }
     }
+    fun getUserProfile(){
+
+    }
 
     fun sendMessage(hashMap: HashMap<Any, Any>) {
         viewModelScope.launch {
-            sendMessageCase(hashMap).collect { result ->
+            sendMessageCase(chatRoomId(), hashMap).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         _state.value =
@@ -78,6 +81,14 @@ class SendMessageViewModel(private val usersIds: List<String>) : ViewModel(), Ko
                     is Resource.Loading -> {}
                 }
             }
+        }
+    }
+
+    private fun chatRoomId(): String {
+        return if (usersIds[0].hashCode() < usersIds[1].hashCode()) {
+            usersIds[0] + "_" + usersIds[1]
+        } else {
+            usersIds[1] + "_" + usersIds[0]
         }
     }
 

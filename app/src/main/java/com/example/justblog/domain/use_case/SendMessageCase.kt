@@ -9,8 +9,8 @@ import kotlinx.coroutines.tasks.await
 class SendMessageCase(
     private val sendMessageRepository: SendMessageRepository
 ) {
-    operator fun invoke(hashMap: HashMap<Any, Any>) = callbackFlow<Resource<Boolean>> {
-        sendMessageRepository.sendMessage(hashMap).addOnCompleteListener {
+    operator fun invoke(chatRoomId:String,hashMap: HashMap<Any, Any>) = callbackFlow<Resource<Boolean>> {
+        sendMessageRepository.sendMessage(chatRoomId,hashMap).addOnCompleteListener {
             if (it.isSuccessful) {
                 trySend(Resource.Success(true))
             } else {
