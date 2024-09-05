@@ -38,7 +38,7 @@ class HomeParent : Fragment() {
             childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         binding.bottomNavigation.setupWithNavController(navController)
-        homeParentViewModel= ViewModelProvider(this)[HomeParentViewModel::class.java]
+        homeParentViewModel = ViewModelProvider(this)[HomeParentViewModel::class.java]
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
             if (controller.currentDestination?.id == R.id.home2) {
                 binding.homeParentIconsLinear.visibility = View.VISIBLE
@@ -51,8 +51,14 @@ class HomeParent : Fragment() {
         val profileButton =
             binding.bottomNavigation.findViewById<BottomNavigationItemView>(R.id.profile)
         profileButton.setOnLongClickListener {
-            homeParentViewModel.showSelectImageDialog(requireContext(), R.layout.bottom_sheet_sign_out)
+            homeParentViewModel.showSelectImageDialog(
+                requireContext(),
+                R.layout.bottom_sheet_sign_out
+            )
             true
+        }
+        binding.homeParentSendMessageIcon.setOnClickListener {
+            MainActivity.mainViewPager.setCurrentItem(2, true)
         }
 
         return binding.root
