@@ -39,7 +39,7 @@ class GetMessageListCase(
                     receiverId = documentSnapshot.getString("receiverId") ?: "",
                     content = documentSnapshot.getString("content") ?: "",
                     date = documentSnapshot.getTimestamp("date")?.toDate() ?: Date(),
-                    users = arrayListOf(),// documentSnapshot.getField<ArrayList<String>>("date") as ArrayList<String>,
+                    users = documentSnapshot.get("users") as? ArrayList<String> ?: arrayListOf(),
                     isRead = documentSnapshot.getBoolean("isRead") ?: false,
                     type = documentSnapshot.getString("type").toString()
                 )

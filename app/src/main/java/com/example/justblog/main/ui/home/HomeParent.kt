@@ -12,6 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.justblog.R
 import com.example.justblog.databinding.FragmentHomeParentBinding
+import com.example.justblog.main.ui.chat.ChatParent
 import com.example.justblog.main.ui.main.MainActivity
 import com.example.justblog.main.viewmodel.HomeParentViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
